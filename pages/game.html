@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Título</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <!-- AOS CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <!-- AOS JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery UI JS -->
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <!-- jQuery UI CSS (opcional, para estilos de widgets) -->
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"
+    />
+    <!-- sonidos midi -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@latest/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <nav class="nav">
+        <div class="container-grid">
+          <div class="wrapper-image-header">
+            <a href="../index.html">
+              <img
+                src="../assets/logo_pokemon.png"
+                alt="Logo Pokemon"
+                class="image-header"
+              />
+            </a>
+          </div>
+          <div class="nav-logo">
+            <button class="menu-toggle" aria-label="Abrir menú">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </button>
+          </div>
+          <ul class="nav-list">
+            <li data-page="home"><a href="../index.html">Home</a></li>
+            <li data-page="pokedex"><a href="./pokedex.html">Pokédex</a></li>
+            <!--<li data-page="pokemon"><a href="./pokemon.html">Pokémon</a></li>-->
+            <li data-page="abilities">
+              <a href="./abilities.html">Abilities</a>
+            </li>
+            <li data-page="moves"><a href="./moves.html">Moves</a></li>
+            <li data-page="game"><a href="./game.html">Battle</a></li>
+            <li data-page="activities"><a href="./activities.html">Activities</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <section class="first-margin sctn-game">
+      <div class="container-grid" data-aos="fade-up"
+        data-aos-delay="1200"
+        data-aos-duration="600">
+        <div class="filters">
+          <input
+            type="text"
+            class="input-search"
+            placeholder="Nombre o Nº PokéDex"
+            id="searchInputPokedex"
+            data-aos="fade-right"
+          />
+        </div>
+        <div class="list-pokemon" data-aos="fade-up" data-aos-duration="600"></div>
+      </div>
+    </section>
+
+    <div class="modal-pokemon modal">
+      <div class="overlay">
+        <button class="close-modal text-color-dark-third"></button>
+        <h2 class="title text-color-dark-third"></h2>
+        <div class="wrapper">
+        <img src="" class="image"/>
+        <ul class="type"></ul>
+        <ul class="list-stats text-color-dark-two">
+          <li class="stat-item hp text-color-dark-third"></li>
+          <li class="stat-item attack text-color-dark-third"></li>
+          <li class="stat-item defense text-color-dark-third"></li>
+          <li class="stat-item special-attack text-color-dark-third"></li>
+          <li class="stat-item special-defense text-color-dark-third"></li>
+          <li class="stat-item speed text-color-dark-third"></li>
+        </ul>
+        </div>
+        <a href="./battleground.html" class="btn btn-dark" id="battleBtn">Entrenar</a>
+      </div>
+    </div>
+
+    <script type="module" src="../scripts/index.js"></script>
+    <script type="module" src="../scripts/game.js"></script>
+  </body>
+</html>

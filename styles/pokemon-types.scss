@@ -1,0 +1,995 @@
+// === Variables de colores Pokémon ===
+$normal: #A8A77A;
+$fire: #EE8130;
+$water: #6390F0;
+$electric: #F7D02C;
+$grass: #7AC74C;
+$ice: #96D9D6;
+$fighting: #C22E28;
+$poison: #A33EA1;
+$ground: #E2BF65;
+$flying: #A98FF3;
+$psychic: #F95587;
+$bug: #A6B91A;
+$rock: #B6A136;
+$ghost: #735797;
+$dragon: #6F35FC;
+$dark: #705746;
+$steel: #B7B7CE;
+$fairy: #D685AD;
+
+// === Clases para un solo tipo ===
+.type-normal {
+  background-color: $normal;
+}
+.type-fire {
+  background-color: $fire;
+}
+.type-water {
+  background-color: $water;
+}
+.type-electric {
+  background-color: $electric;
+}
+.type-grass {
+  background-color: $grass;
+}
+.type-ice {
+  background-color: $ice;
+}
+.type-fighting {
+  background-color: $fighting;
+}
+.type-poison {
+  background-color: $poison;
+}
+.type-ground {
+  background-color: $ground;
+}
+.type-flying {
+  background-color: $flying;
+}
+.type-psychic {
+  background-color: $psychic;
+}
+.type-bug {
+  background-color: $bug;
+}
+.type-rock {
+  background-color: $rock;
+}
+.type-ghost {
+  background-color: $ghost;
+}
+.type-dragon {
+  background-color: $dragon;
+}
+.type-dark {
+  background-color: $dark;
+}
+.type-steel {
+  background-color: $steel;
+}
+.type-fairy {
+  background-color: $fairy;
+}
+
+// === Combinaciones dobles de tipos ===
+.type-normal-fire {
+  background: linear-gradient(135deg, $normal 50%, $fire 50%);
+}
+.type-normal-water {
+  background: linear-gradient(135deg, $normal 50%, $water 50%);
+}
+.type-normal-electric {
+  background: linear-gradient(135deg, $normal 50%, $electric 50%);
+}
+.type-normal-grass {
+  background: linear-gradient(135deg, $normal 50%, $grass 50%);
+}
+.type-normal-ice {
+  background: linear-gradient(135deg, $normal 50%, $ice 50%);
+}
+.type-normal-fighting {
+  background: linear-gradient(135deg, $normal 50%, $fighting 50%);
+}
+.type-normal-poison {
+  background: linear-gradient(135deg, $normal 50%, $poison 50%);
+}
+.type-normal-ground {
+  background: linear-gradient(135deg, $normal 50%, $ground 50%);
+}
+.type-normal-flying {
+  background: linear-gradient(135deg, $normal 50%, $flying 50%);
+}
+.type-normal-psychic {
+  background: linear-gradient(135deg, $normal 50%, $psychic 50%);
+}
+.type-normal-bug {
+  background: linear-gradient(135deg, $normal 50%, $bug 50%);
+}
+.type-normal-rock {
+  background: linear-gradient(135deg, $normal 50%, $rock 50%);
+}
+.type-normal-ghost {
+  background: linear-gradient(135deg, $normal 50%, $ghost 50%);
+}
+.type-normal-dragon {
+  background: linear-gradient(135deg, $normal 50%, $dragon 50%);
+}
+.type-normal-dark {
+  background: linear-gradient(135deg, $normal 50%, $dark 50%);
+}
+.type-normal-steel {
+  background: linear-gradient(135deg, $normal 50%, $steel 50%);
+}
+.type-normal-fairy {
+  background: linear-gradient(135deg, $normal 50%, $fairy 50%);
+}
+.type-fire-normal {
+  background: linear-gradient(135deg, $fire 50%, $normal 50%);
+}
+.type-fire-water {
+  background: linear-gradient(135deg, $fire 50%, $water 50%);
+}
+.type-fire-electric {
+  background: linear-gradient(135deg, $fire 50%, $electric 50%);
+}
+.type-fire-grass {
+  background: linear-gradient(135deg, $fire 50%, $grass 50%);
+}
+.type-fire-ice {
+  background: linear-gradient(135deg, $fire 50%, $ice 50%);
+}
+.type-fire-fighting {
+  background: linear-gradient(135deg, $fire 50%, $fighting 50%);
+}
+.type-fire-poison {
+  background: linear-gradient(135deg, $fire 50%, $poison 50%);
+}
+.type-fire-ground {
+  background: linear-gradient(135deg, $fire 50%, $ground 50%);
+}
+.type-fire-flying {
+  background: linear-gradient(135deg, $fire 50%, $flying 50%);
+}
+.type-fire-psychic {
+  background: linear-gradient(135deg, $fire 50%, $psychic 50%);
+}
+.type-fire-bug {
+  background: linear-gradient(135deg, $fire 50%, $bug 50%);
+}
+.type-fire-rock {
+  background: linear-gradient(135deg, $fire 50%, $rock 50%);
+}
+.type-fire-ghost {
+  background: linear-gradient(135deg, $fire 50%, $ghost 50%);
+}
+.type-fire-dragon {
+  background: linear-gradient(135deg, $fire 50%, $dragon 50%);
+}
+.type-fire-dark {
+  background: linear-gradient(135deg, $fire 50%, $dark 50%);
+}
+.type-fire-steel {
+  background: linear-gradient(135deg, $fire 50%, $steel 50%);
+}
+.type-fire-fairy {
+  background: linear-gradient(135deg, $fire 50%, $fairy 50%);
+}
+.type-water-normal {
+  background: linear-gradient(135deg, $water 50%, $normal 50%);
+}
+.type-water-fire {
+  background: linear-gradient(135deg, $water 50%, $fire 50%);
+}
+.type-water-electric {
+  background: linear-gradient(135deg, $water 50%, $electric 50%);
+}
+.type-water-grass {
+  background: linear-gradient(135deg, $water 50%, $grass 50%);
+}
+.type-water-ice {
+  background: linear-gradient(135deg, $water 50%, $ice 50%);
+}
+.type-water-fighting {
+  background: linear-gradient(135deg, $water 50%, $fighting 50%);
+}
+.type-water-poison {
+  background: linear-gradient(135deg, $water 50%, $poison 50%);
+}
+.type-water-ground {
+  background: linear-gradient(135deg, $water 50%, $ground 50%);
+}
+.type-water-flying {
+  background: linear-gradient(135deg, $water 50%, $flying 50%);
+}
+.type-water-psychic {
+  background: linear-gradient(135deg, $water 50%, $psychic 50%);
+}
+.type-water-bug {
+  background: linear-gradient(135deg, $water 50%, $bug 50%);
+}
+.type-water-rock {
+  background: linear-gradient(135deg, $water 50%, $rock 50%);
+}
+.type-water-ghost {
+  background: linear-gradient(135deg, $water 50%, $ghost 50%);
+}
+.type-water-dragon {
+  background: linear-gradient(135deg, $water 50%, $dragon 50%);
+}
+.type-water-dark {
+  background: linear-gradient(135deg, $water 50%, $dark 50%);
+}
+.type-water-steel {
+  background: linear-gradient(135deg, $water 50%, $steel 50%);
+}
+.type-water-fairy {
+  background: linear-gradient(135deg, $water 50%, $fairy 50%);
+}
+.type-electric-normal {
+  background: linear-gradient(135deg, $electric 50%, $normal 50%);
+}
+.type-electric-fire {
+  background: linear-gradient(135deg, $electric 50%, $fire 50%);
+}
+.type-electric-water {
+  background: linear-gradient(135deg, $electric 50%, $water 50%);
+}
+.type-electric-grass {
+  background: linear-gradient(135deg, $electric 50%, $grass 50%);
+}
+.type-electric-ice {
+  background: linear-gradient(135deg, $electric 50%, $ice 50%);
+}
+.type-electric-fighting {
+  background: linear-gradient(135deg, $electric 50%, $fighting 50%);
+}
+.type-electric-poison {
+  background: linear-gradient(135deg, $electric 50%, $poison 50%);
+}
+.type-electric-ground {
+  background: linear-gradient(135deg, $electric 50%, $ground 50%);
+}
+.type-electric-flying {
+  background: linear-gradient(135deg, $electric 50%, $flying 50%);
+}
+.type-electric-psychic {
+  background: linear-gradient(135deg, $electric 50%, $psychic 50%);
+}
+.type-electric-bug {
+  background: linear-gradient(135deg, $electric 50%, $bug 50%);
+}
+.type-electric-rock {
+  background: linear-gradient(135deg, $electric 50%, $rock 50%);
+}
+.type-electric-ghost {
+  background: linear-gradient(135deg, $electric 50%, $ghost 50%);
+}
+.type-electric-dragon {
+  background: linear-gradient(135deg, $electric 50%, $dragon 50%);
+}
+.type-electric-dark {
+  background: linear-gradient(135deg, $electric 50%, $dark 50%);
+}
+.type-electric-steel {
+  background: linear-gradient(135deg, $electric 50%, $steel 50%);
+}
+.type-electric-fairy {
+  background: linear-gradient(135deg, $electric 50%, $fairy 50%);
+}
+.type-grass-normal {
+  background: linear-gradient(135deg, $grass 50%, $normal 50%);
+}
+.type-grass-fire {
+  background: linear-gradient(135deg, $grass 50%, $fire 50%);
+}
+.type-grass-water {
+  background: linear-gradient(135deg, $grass 50%, $water 50%);
+}
+.type-grass-electric {
+  background: linear-gradient(135deg, $grass 50%, $electric 50%);
+}
+.type-grass-ice {
+  background: linear-gradient(135deg, $grass 50%, $ice 50%);
+}
+.type-grass-fighting {
+  background: linear-gradient(135deg, $grass 50%, $fighting 50%);
+}
+.type-grass-poison {
+  background: linear-gradient(135deg, $grass 50%, $poison 50%);
+}
+.type-grass-ground {
+  background: linear-gradient(135deg, $grass 50%, $ground 50%);
+}
+.type-grass-flying {
+  background: linear-gradient(135deg, $grass 50%, $flying 50%);
+}
+.type-grass-psychic {
+  background: linear-gradient(135deg, $grass 50%, $psychic 50%);
+}
+.type-grass-bug {
+  background: linear-gradient(135deg, $grass 50%, $bug 50%);
+}
+.type-grass-rock {
+  background: linear-gradient(135deg, $grass 50%, $rock 50%);
+}
+.type-grass-ghost {
+  background: linear-gradient(135deg, $grass 50%, $ghost 50%);
+}
+.type-grass-dragon {
+  background: linear-gradient(135deg, $grass 50%, $dragon 50%);
+}
+.type-grass-dark {
+  background: linear-gradient(135deg, $grass 50%, $dark 50%);
+}
+.type-grass-steel {
+  background: linear-gradient(135deg, $grass 50%, $steel 50%);
+}
+.type-grass-fairy {
+  background: linear-gradient(135deg, $grass 50%, $fairy 50%);
+}
+.type-ice-normal {
+  background: linear-gradient(135deg, $ice 50%, $normal 50%);
+}
+.type-ice-fire {
+  background: linear-gradient(135deg, $ice 50%, $fire 50%);
+}
+.type-ice-water {
+  background: linear-gradient(135deg, $ice 50%, $water 50%);
+}
+.type-ice-electric {
+  background: linear-gradient(135deg, $ice 50%, $electric 50%);
+}
+.type-ice-grass {
+  background: linear-gradient(135deg, $ice 50%, $grass 50%);
+}
+.type-ice-fighting {
+  background: linear-gradient(135deg, $ice 50%, $fighting 50%);
+}
+.type-ice-poison {
+  background: linear-gradient(135deg, $ice 50%, $poison 50%);
+}
+.type-ice-ground {
+  background: linear-gradient(135deg, $ice 50%, $ground 50%);
+}
+.type-ice-flying {
+  background: linear-gradient(135deg, $ice 50%, $flying 50%);
+}
+.type-ice-psychic {
+  background: linear-gradient(135deg, $ice 50%, $psychic 50%);
+}
+.type-ice-bug {
+  background: linear-gradient(135deg, $ice 50%, $bug 50%);
+}
+.type-ice-rock {
+  background: linear-gradient(135deg, $ice 50%, $rock 50%);
+}
+.type-ice-ghost {
+  background: linear-gradient(135deg, $ice 50%, $ghost 50%);
+}
+.type-ice-dragon {
+  background: linear-gradient(135deg, $ice 50%, $dragon 50%);
+}
+.type-ice-dark {
+  background: linear-gradient(135deg, $ice 50%, $dark 50%);
+}
+.type-ice-steel {
+  background: linear-gradient(135deg, $ice 50%, $steel 50%);
+}
+.type-ice-fairy {
+  background: linear-gradient(135deg, $ice 50%, $fairy 50%);
+}
+.type-fighting-normal {
+  background: linear-gradient(135deg, $fighting 50%, $normal 50%);
+}
+.type-fighting-fire {
+  background: linear-gradient(135deg, $fighting 50%, $fire 50%);
+}
+.type-fighting-water {
+  background: linear-gradient(135deg, $fighting 50%, $water 50%);
+}
+.type-fighting-electric {
+  background: linear-gradient(135deg, $fighting 50%, $electric 50%);
+}
+.type-fighting-grass {
+  background: linear-gradient(135deg, $fighting 50%, $grass 50%);
+}
+.type-fighting-ice {
+  background: linear-gradient(135deg, $fighting 50%, $ice 50%);
+}
+.type-fighting-poison {
+  background: linear-gradient(135deg, $fighting 50%, $poison 50%);
+}
+.type-fighting-ground {
+  background: linear-gradient(135deg, $fighting 50%, $ground 50%);
+}
+.type-fighting-flying {
+  background: linear-gradient(135deg, $fighting 50%, $flying 50%);
+}
+.type-fighting-psychic {
+  background: linear-gradient(135deg, $fighting 50%, $psychic 50%);
+}
+.type-fighting-bug {
+  background: linear-gradient(135deg, $fighting 50%, $bug 50%);
+}
+.type-fighting-rock {
+  background: linear-gradient(135deg, $fighting 50%, $rock 50%);
+}
+.type-fighting-ghost {
+  background: linear-gradient(135deg, $fighting 50%, $ghost 50%);
+}
+.type-fighting-dragon {
+  background: linear-gradient(135deg, $fighting 50%, $dragon 50%);
+}
+.type-fighting-dark {
+  background: linear-gradient(135deg, $fighting 50%, $dark 50%);
+}
+.type-fighting-steel {
+  background: linear-gradient(135deg, $fighting 50%, $steel 50%);
+}
+.type-fighting-fairy {
+  background: linear-gradient(135deg, $fighting 50%, $fairy 50%);
+}
+.type-poison-normal {
+  background: linear-gradient(135deg, $poison 50%, $normal 50%);
+}
+.type-poison-fire {
+  background: linear-gradient(135deg, $poison 50%, $fire 50%);
+}
+.type-poison-water {
+  background: linear-gradient(135deg, $poison 50%, $water 50%);
+}
+.type-poison-electric {
+  background: linear-gradient(135deg, $poison 50%, $electric 50%);
+}
+.type-poison-grass {
+  background: linear-gradient(135deg, $poison 50%, $grass 50%);
+}
+.type-poison-ice {
+  background: linear-gradient(135deg, $poison 50%, $ice 50%);
+}
+.type-poison-fighting {
+  background: linear-gradient(135deg, $poison 50%, $fighting 50%);
+}
+.type-poison-ground {
+  background: linear-gradient(135deg, $poison 50%, $ground 50%);
+}
+.type-poison-flying {
+  background: linear-gradient(135deg, $poison 50%, $flying 50%);
+}
+.type-poison-psychic {
+  background: linear-gradient(135deg, $poison 50%, $psychic 50%);
+}
+.type-poison-bug {
+  background: linear-gradient(135deg, $poison 50%, $bug 50%);
+}
+.type-poison-rock {
+  background: linear-gradient(135deg, $poison 50%, $rock 50%);
+}
+.type-poison-ghost {
+  background: linear-gradient(135deg, $poison 50%, $ghost 50%);
+}
+.type-poison-dragon {
+  background: linear-gradient(135deg, $poison 50%, $dragon 50%);
+}
+.type-poison-dark {
+  background: linear-gradient(135deg, $poison 50%, $dark 50%);
+}
+.type-poison-steel {
+  background: linear-gradient(135deg, $poison 50%, $steel 50%);
+}
+.type-poison-fairy {
+  background: linear-gradient(135deg, $poison 50%, $fairy 50%);
+}
+.type-ground-normal {
+  background: linear-gradient(135deg, $ground 50%, $normal 50%);
+}
+.type-ground-fire {
+  background: linear-gradient(135deg, $ground 50%, $fire 50%);
+}
+.type-ground-water {
+  background: linear-gradient(135deg, $ground 50%, $water 50%);
+}
+.type-ground-electric {
+  background: linear-gradient(135deg, $ground 50%, $electric 50%);
+}
+.type-ground-grass {
+  background: linear-gradient(135deg, $ground 50%, $grass 50%);
+}
+.type-ground-ice {
+  background: linear-gradient(135deg, $ground 50%, $ice 50%);
+}
+.type-ground-fighting {
+  background: linear-gradient(135deg, $ground 50%, $fighting 50%);
+}
+.type-ground-poison {
+  background: linear-gradient(135deg, $ground 50%, $poison 50%);
+}
+.type-ground-flying {
+  background: linear-gradient(135deg, $ground 50%, $flying 50%);
+}
+.type-ground-psychic {
+  background: linear-gradient(135deg, $ground 50%, $psychic 50%);
+}
+.type-ground-bug {
+  background: linear-gradient(135deg, $ground 50%, $bug 50%);
+}
+.type-ground-rock {
+  background: linear-gradient(135deg, $ground 50%, $rock 50%);
+}
+.type-ground-ghost {
+  background: linear-gradient(135deg, $ground 50%, $ghost 50%);
+}
+.type-ground-dragon {
+  background: linear-gradient(135deg, $ground 50%, $dragon 50%);
+}
+.type-ground-dark {
+  background: linear-gradient(135deg, $ground 50%, $dark 50%);
+}
+.type-ground-steel {
+  background: linear-gradient(135deg, $ground 50%, $steel 50%);
+}
+.type-ground-fairy {
+  background: linear-gradient(135deg, $ground 50%, $fairy 50%);
+}
+.type-flying-normal {
+  background: linear-gradient(135deg, $flying 50%, $normal 50%);
+}
+.type-flying-fire {
+  background: linear-gradient(135deg, $flying 50%, $fire 50%);
+}
+.type-flying-water {
+  background: linear-gradient(135deg, $flying 50%, $water 50%);
+}
+.type-flying-electric {
+  background: linear-gradient(135deg, $flying 50%, $electric 50%);
+}
+.type-flying-grass {
+  background: linear-gradient(135deg, $flying 50%, $grass 50%);
+}
+.type-flying-ice {
+  background: linear-gradient(135deg, $flying 50%, $ice 50%);
+}
+.type-flying-fighting {
+  background: linear-gradient(135deg, $flying 50%, $fighting 50%);
+}
+.type-flying-poison {
+  background: linear-gradient(135deg, $flying 50%, $poison 50%);
+}
+.type-flying-ground {
+  background: linear-gradient(135deg, $flying 50%, $ground 50%);
+}
+.type-flying-psychic {
+  background: linear-gradient(135deg, $flying 50%, $psychic 50%);
+}
+.type-flying-bug {
+  background: linear-gradient(135deg, $flying 50%, $bug 50%);
+}
+.type-flying-rock {
+  background: linear-gradient(135deg, $flying 50%, $rock 50%);
+}
+.type-flying-ghost {
+  background: linear-gradient(135deg, $flying 50%, $ghost 50%);
+}
+.type-flying-dragon {
+  background: linear-gradient(135deg, $flying 50%, $dragon 50%);
+}
+.type-flying-dark {
+  background: linear-gradient(135deg, $flying 50%, $dark 50%);
+}
+.type-flying-steel {
+  background: linear-gradient(135deg, $flying 50%, $steel 50%);
+}
+.type-flying-fairy {
+  background: linear-gradient(135deg, $flying 50%, $fairy 50%);
+}
+.type-psychic-normal {
+  background: linear-gradient(135deg, $psychic 50%, $normal 50%);
+}
+.type-psychic-fire {
+  background: linear-gradient(135deg, $psychic 50%, $fire 50%);
+}
+.type-psychic-water {
+  background: linear-gradient(135deg, $psychic 50%, $water 50%);
+}
+.type-psychic-electric {
+  background: linear-gradient(135deg, $psychic 50%, $electric 50%);
+}
+.type-psychic-grass {
+  background: linear-gradient(135deg, $psychic 50%, $grass 50%);
+}
+.type-psychic-ice {
+  background: linear-gradient(135deg, $psychic 50%, $ice 50%);
+}
+.type-psychic-fighting {
+  background: linear-gradient(135deg, $psychic 50%, $fighting 50%);
+}
+.type-psychic-poison {
+  background: linear-gradient(135deg, $psychic 50%, $poison 50%);
+}
+.type-psychic-ground {
+  background: linear-gradient(135deg, $psychic 50%, $ground 50%);
+}
+.type-psychic-flying {
+  background: linear-gradient(135deg, $psychic 50%, $flying 50%);
+}
+.type-psychic-bug {
+  background: linear-gradient(135deg, $psychic 50%, $bug 50%);
+}
+.type-psychic-rock {
+  background: linear-gradient(135deg, $psychic 50%, $rock 50%);
+}
+.type-psychic-ghost {
+  background: linear-gradient(135deg, $psychic 50%, $ghost 50%);
+}
+.type-psychic-dragon {
+  background: linear-gradient(135deg, $psychic 50%, $dragon 50%);
+}
+.type-psychic-dark {
+  background: linear-gradient(135deg, $psychic 50%, $dark 50%);
+}
+.type-psychic-steel {
+  background: linear-gradient(135deg, $psychic 50%, $steel 50%);
+}
+.type-psychic-fairy {
+  background: linear-gradient(135deg, $psychic 50%, $fairy 50%);
+}
+.type-bug-normal {
+  background: linear-gradient(135deg, $bug 50%, $normal 50%);
+}
+.type-bug-fire {
+  background: linear-gradient(135deg, $bug 50%, $fire 50%);
+}
+.type-bug-water {
+  background: linear-gradient(135deg, $bug 50%, $water 50%);
+}
+.type-bug-electric {
+  background: linear-gradient(135deg, $bug 50%, $electric 50%);
+}
+.type-bug-grass {
+  background: linear-gradient(135deg, $bug 50%, $grass 50%);
+}
+.type-bug-ice {
+  background: linear-gradient(135deg, $bug 50%, $ice 50%);
+}
+.type-bug-fighting {
+  background: linear-gradient(135deg, $bug 50%, $fighting 50%);
+}
+.type-bug-poison {
+  background: linear-gradient(135deg, $bug 50%, $poison 50%);
+}
+.type-bug-ground {
+  background: linear-gradient(135deg, $bug 50%, $ground 50%);
+}
+.type-bug-flying {
+  background: linear-gradient(135deg, $bug 50%, $flying 50%);
+}
+.type-bug-psychic {
+  background: linear-gradient(135deg, $bug 50%, $psychic 50%);
+}
+.type-bug-rock {
+  background: linear-gradient(135deg, $bug 50%, $rock 50%);
+}
+.type-bug-ghost {
+  background: linear-gradient(135deg, $bug 50%, $ghost 50%);
+}
+.type-bug-dragon {
+  background: linear-gradient(135deg, $bug 50%, $dragon 50%);
+}
+.type-bug-dark {
+  background: linear-gradient(135deg, $bug 50%, $dark 50%);
+}
+.type-bug-steel {
+  background: linear-gradient(135deg, $bug 50%, $steel 50%);
+}
+.type-bug-fairy {
+  background: linear-gradient(135deg, $bug 50%, $fairy 50%);
+}
+.type-rock-normal {
+  background: linear-gradient(135deg, $rock 50%, $normal 50%);
+}
+.type-rock-fire {
+  background: linear-gradient(135deg, $rock 50%, $fire 50%);
+}
+.type-rock-water {
+  background: linear-gradient(135deg, $rock 50%, $water 50%);
+}
+.type-rock-electric {
+  background: linear-gradient(135deg, $rock 50%, $electric 50%);
+}
+.type-rock-grass {
+  background: linear-gradient(135deg, $rock 50%, $grass 50%);
+}
+.type-rock-ice {
+  background: linear-gradient(135deg, $rock 50%, $ice 50%);
+}
+.type-rock-fighting {
+  background: linear-gradient(135deg, $rock 50%, $fighting 50%);
+}
+.type-rock-poison {
+  background: linear-gradient(135deg, $rock 50%, $poison 50%);
+}
+.type-rock-ground {
+  background: linear-gradient(135deg, $rock 50%, $ground 50%);
+}
+.type-rock-flying {
+  background: linear-gradient(135deg, $rock 50%, $flying 50%);
+}
+.type-rock-psychic {
+  background: linear-gradient(135deg, $rock 50%, $psychic 50%);
+}
+.type-rock-bug {
+  background: linear-gradient(135deg, $rock 50%, $bug 50%);
+}
+.type-rock-ghost {
+  background: linear-gradient(135deg, $rock 50%, $ghost 50%);
+}
+.type-rock-dragon {
+  background: linear-gradient(135deg, $rock 50%, $dragon 50%);
+}
+.type-rock-dark {
+  background: linear-gradient(135deg, $rock 50%, $dark 50%);
+}
+.type-rock-steel {
+  background: linear-gradient(135deg, $rock 50%, $steel 50%);
+}
+.type-rock-fairy {
+  background: linear-gradient(135deg, $rock 50%, $fairy 50%);
+}
+.type-ghost-normal {
+  background: linear-gradient(135deg, $ghost 50%, $normal 50%);
+}
+.type-ghost-fire {
+  background: linear-gradient(135deg, $ghost 50%, $fire 50%);
+}
+.type-ghost-water {
+  background: linear-gradient(135deg, $ghost 50%, $water 50%);
+}
+.type-ghost-electric {
+  background: linear-gradient(135deg, $ghost 50%, $electric 50%);
+}
+.type-ghost-grass {
+  background: linear-gradient(135deg, $ghost 50%, $grass 50%);
+}
+.type-ghost-ice {
+  background: linear-gradient(135deg, $ghost 50%, $ice 50%);
+}
+.type-ghost-fighting {
+  background: linear-gradient(135deg, $ghost 50%, $fighting 50%);
+}
+.type-ghost-poison {
+  background: linear-gradient(135deg, $ghost 50%, $poison 50%);
+}
+.type-ghost-ground {
+  background: linear-gradient(135deg, $ghost 50%, $ground 50%);
+}
+.type-ghost-flying {
+  background: linear-gradient(135deg, $ghost 50%, $flying 50%);
+}
+.type-ghost-psychic {
+  background: linear-gradient(135deg, $ghost 50%, $psychic 50%);
+}
+.type-ghost-bug {
+  background: linear-gradient(135deg, $ghost 50%, $bug 50%);
+}
+.type-ghost-rock {
+  background: linear-gradient(135deg, $ghost 50%, $rock 50%);
+}
+.type-ghost-dragon {
+  background: linear-gradient(135deg, $ghost 50%, $dragon 50%);
+}
+.type-ghost-dark {
+  background: linear-gradient(135deg, $ghost 50%, $dark 50%);
+}
+.type-ghost-steel {
+  background: linear-gradient(135deg, $ghost 50%, $steel 50%);
+}
+.type-ghost-fairy {
+  background: linear-gradient(135deg, $ghost 50%, $fairy 50%);
+}
+.type-dragon-normal {
+  background: linear-gradient(135deg, $dragon 50%, $normal 50%);
+}
+.type-dragon-fire {
+  background: linear-gradient(135deg, $dragon 50%, $fire 50%);
+}
+.type-dragon-water {
+  background: linear-gradient(135deg, $dragon 50%, $water 50%);
+}
+.type-dragon-electric {
+  background: linear-gradient(135deg, $dragon 50%, $electric 50%);
+}
+.type-dragon-grass {
+  background: linear-gradient(135deg, $dragon 50%, $grass 50%);
+}
+.type-dragon-ice {
+  background: linear-gradient(135deg, $dragon 50%, $ice 50%);
+}
+.type-dragon-fighting {
+  background: linear-gradient(135deg, $dragon 50%, $fighting 50%);
+}
+.type-dragon-poison {
+  background: linear-gradient(135deg, $dragon 50%, $poison 50%);
+}
+.type-dragon-ground {
+  background: linear-gradient(135deg, $dragon 50%, $ground 50%);
+}
+.type-dragon-flying {
+  background: linear-gradient(135deg, $dragon 50%, $flying 50%);
+}
+.type-dragon-psychic {
+  background: linear-gradient(135deg, $dragon 50%, $psychic 50%);
+}
+.type-dragon-bug {
+  background: linear-gradient(135deg, $dragon 50%, $bug 50%);
+}
+.type-dragon-rock {
+  background: linear-gradient(135deg, $dragon 50%, $rock 50%);
+}
+.type-dragon-ghost {
+  background: linear-gradient(135deg, $dragon 50%, $ghost 50%);
+}
+.type-dragon-dark {
+  background: linear-gradient(135deg, $dragon 50%, $dark 50%);
+}
+.type-dragon-steel {
+  background: linear-gradient(135deg, $dragon 50%, $steel 50%);
+}
+.type-dragon-fairy {
+  background: linear-gradient(135deg, $dragon 50%, $fairy 50%);
+}
+.type-dark-normal {
+  background: linear-gradient(135deg, $dark 50%, $normal 50%);
+}
+.type-dark-fire {
+  background: linear-gradient(135deg, $dark 50%, $fire 50%);
+}
+.type-dark-water {
+  background: linear-gradient(135deg, $dark 50%, $water 50%);
+}
+.type-dark-electric {
+  background: linear-gradient(135deg, $dark 50%, $electric 50%);
+}
+.type-dark-grass {
+  background: linear-gradient(135deg, $dark 50%, $grass 50%);
+}
+.type-dark-ice {
+  background: linear-gradient(135deg, $dark 50%, $ice 50%);
+}
+.type-dark-fighting {
+  background: linear-gradient(135deg, $dark 50%, $fighting 50%);
+}
+.type-dark-poison {
+  background: linear-gradient(135deg, $dark 50%, $poison 50%);
+}
+.type-dark-ground {
+  background: linear-gradient(135deg, $dark 50%, $ground 50%);
+}
+.type-dark-flying {
+  background: linear-gradient(135deg, $dark 50%, $flying 50%);
+}
+.type-dark-psychic {
+  background: linear-gradient(135deg, $dark 50%, $psychic 50%);
+}
+.type-dark-bug {
+  background: linear-gradient(135deg, $dark 50%, $bug 50%);
+}
+.type-dark-rock {
+  background: linear-gradient(135deg, $dark 50%, $rock 50%);
+}
+.type-dark-ghost {
+  background: linear-gradient(135deg, $dark 50%, $ghost 50%);
+}
+.type-dark-dragon {
+  background: linear-gradient(135deg, $dark 50%, $dragon 50%);
+}
+.type-dark-steel {
+  background: linear-gradient(135deg, $dark 50%, $steel 50%);
+}
+.type-dark-fairy {
+  background: linear-gradient(135deg, $dark 50%, $fairy 50%);
+}
+.type-steel-normal {
+  background: linear-gradient(135deg, $steel 50%, $normal 50%);
+}
+.type-steel-fire {
+  background: linear-gradient(135deg, $steel 50%, $fire 50%);
+}
+.type-steel-water {
+  background: linear-gradient(135deg, $steel 50%, $water 50%);
+}
+.type-steel-electric {
+  background: linear-gradient(135deg, $steel 50%, $electric 50%);
+}
+.type-steel-grass {
+  background: linear-gradient(135deg, $steel 50%, $grass 50%);
+}
+.type-steel-ice {
+  background: linear-gradient(135deg, $steel 50%, $ice 50%);
+}
+.type-steel-fighting {
+  background: linear-gradient(135deg, $steel 50%, $fighting 50%);
+}
+.type-steel-poison {
+  background: linear-gradient(135deg, $steel 50%, $poison 50%);
+}
+.type-steel-ground {
+  background: linear-gradient(135deg, $steel 50%, $ground 50%);
+}
+.type-steel-flying {
+  background: linear-gradient(135deg, $steel 50%, $flying 50%);
+}
+.type-steel-psychic {
+  background: linear-gradient(135deg, $steel 50%, $psychic 50%);
+}
+.type-steel-bug {
+  background: linear-gradient(135deg, $steel 50%, $bug 50%);
+}
+.type-steel-rock {
+  background: linear-gradient(135deg, $steel 50%, $rock 50%);
+}
+.type-steel-ghost {
+  background: linear-gradient(135deg, $steel 50%, $ghost 50%);
+}
+.type-steel-dragon {
+  background: linear-gradient(135deg, $steel 50%, $dragon 50%);
+}
+.type-steel-dark {
+  background: linear-gradient(135deg, $steel 50%, $dark 50%);
+}
+.type-steel-fairy {
+  background: linear-gradient(135deg, $steel 50%, $fairy 50%);
+}
+.type-fairy-normal {
+  background: linear-gradient(135deg, $fairy 50%, $normal 50%);
+}
+.type-fairy-fire {
+  background: linear-gradient(135deg, $fairy 50%, $fire 50%);
+}
+.type-fairy-water {
+  background: linear-gradient(135deg, $fairy 50%, $water 50%);
+}
+.type-fairy-electric {
+  background: linear-gradient(135deg, $fairy 50%, $electric 50%);
+}
+.type-fairy-grass {
+  background: linear-gradient(135deg, $fairy 50%, $grass 50%);
+}
+.type-fairy-ice {
+  background: linear-gradient(135deg, $fairy 50%, $ice 50%);
+}
+.type-fairy-fighting {
+  background: linear-gradient(135deg, $fairy 50%, $fighting 50%);
+}
+.type-fairy-poison {
+  background: linear-gradient(135deg, $fairy 50%, $poison 50%);
+}
+.type-fairy-ground {
+  background: linear-gradient(135deg, $fairy 50%, $ground 50%);
+}
+.type-fairy-flying {
+  background: linear-gradient(135deg, $fairy 50%, $flying 50%);
+}
+.type-fairy-psychic {
+  background: linear-gradient(135deg, $fairy 50%, $psychic 50%);
+}
+.type-fairy-bug {
+  background: linear-gradient(135deg, $fairy 50%, $bug 50%);
+}
+.type-fairy-rock {
+  background: linear-gradient(135deg, $fairy 50%, $rock 50%);
+}
+.type-fairy-ghost {
+  background: linear-gradient(135deg, $fairy 50%, $ghost 50%);
+}
+.type-fairy-dragon {
+  background: linear-gradient(135deg, $fairy 50%, $dragon 50%);
+}
+.type-fairy-dark {
+  background: linear-gradient(135deg, $fairy 50%, $dark 50%);
+}
+.type-fairy-steel {
+  background: linear-gradient(135deg, $fairy 50%, $steel 50%);
+}

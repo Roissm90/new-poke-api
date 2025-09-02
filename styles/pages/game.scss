@@ -1,0 +1,206 @@
+.sctn-game {
+  .container-grid {
+    .filters {
+      margin-bottom: 2rem;
+
+      .input-search {
+        border-radius: 8px;
+        border: none;
+        outline: none;
+        padding: 0.8rem 1.2rem;
+        font-size: 1rem;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+
+    .list-pokemon {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: stretch;
+
+      .pokemon-item {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        max-width: 10rem;
+        width: calc(50% - 0.5rem);
+        min-width: calc(33% - 1rem);
+
+        img {
+          width: 20px;
+          height: 20px;
+          object-fit: cover;
+          object-position: center;
+        }
+
+        .pokemon-name {
+          font-size: 1rem;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}
+
+.modal-pokemon {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -10;
+  transition: all ease-in 0.3s;
+  background-color: #001832d7;
+
+  &.show {
+    pointer-events: auto;
+    opacity: 1;
+    z-index: 1000;
+  }
+
+  .overlay {
+    position: relative;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 700px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 20px;
+      height: 20px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      z-index: 2;
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.2);
+        transition: all ease-in 0.3s;
+      }
+
+      &:before {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        content: "";
+        display: block;
+        transform: rotate(45deg) translateY(-50%);
+        width: 20px;
+        height: 2px;
+        border-radius: 5px;
+        background-color: #000;
+      }
+
+      &:after {
+        position: absolute;
+        bottom: 50%;
+        left: 0;
+        content: "";
+        display: block;
+        transform: rotate(-45deg) translateY(50%);
+        width: 20px;
+        height: 2px;
+        border-radius: 5px;
+        background-color: #000;
+      }
+    }
+
+    .title {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .wrapper {
+      display: flex;
+      align-items: stretch;
+
+      .image {
+        width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        display: block;
+        flex: 1;
+      }
+
+      .type {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 1rem;
+        flex: 1;
+        width: fit-content;
+        padding-right: 2rem;
+        @media (max-width: 768px) {
+          padding-right: 2rem;
+        }
+
+        .type-item {
+          padding: 0.6rem 1rem;
+          border-radius: 8px;
+          width: 100%;
+          text-align: center;
+        }
+      }
+
+      .list-stats {
+        flex: 1;
+        .stat-item {
+          margin-bottom: 0.5rem;
+        }
+      }
+    }
+
+    .btn {
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      display: block;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sctn-game {
+    .container-grid {
+      .list-pokemon {
+        .pokemon-item {
+          min-width: calc(50% - 0.5rem);
+          .pokemon-name {
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+
+  .modal-pokemon {
+    .overlay {
+      max-width: 320px;
+      .wrapper {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  }
+}

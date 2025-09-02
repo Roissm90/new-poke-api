@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Título</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <!-- AOS CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <!-- AOS JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery UI JS -->
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <!-- jQuery UI CSS (opcional, para estilos de widgets) -->
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"
+    />
+    <!-- sonidos midi -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@latest/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <nav class="nav">
+        <div class="container-grid">
+          <div class="wrapper-image-header">
+            <a href="../index.html">
+              <img
+                src="../assets/logo_pokemon.png"
+                alt="Logo Pokemon"
+                class="image-header"
+              />
+            </a>
+          </div>
+          <div class="nav-logo">
+            <button class="menu-toggle" aria-label="Abrir menú">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </button>
+          </div>
+          <ul class="nav-list">
+            <li data-page="home"><a href="../index.html">Home</a></li>
+            <li data-page="pokedex"><a href="./pokedex.html">Pokédex</a></li>
+            <!--<li data-page="pokemon"><a href="./pokemon.html">Pokémon</a></li>-->
+            <li data-page="abilities">
+              <a href="./abilities.html">Abilities</a>
+            </li>
+            <li data-page="moves"><a href="./moves.html">Moves</a></li>
+            <li data-page="game"><a href="./game.html">Battle</a></li>
+            <li data-page="activities"><a href="./activities.html">Activities</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <section class="first-margin sctn-prepare">
+      <div class="container-grid" data-aos="fade-up"
+        data-aos-delay="600"
+        data-aos-duration="600"></div>
+    </section>
+
+    <div class="modal-prepare">
+      <div class="overlay">
+        <button class="close-modal"></button>
+        <h4 class="title text-color-dark-third"></h4>
+        <ul class="list list-moves-selected"></ul>
+        <div class="wrapper-lists">
+          <img src="" alt="" class="picture" />
+          <ul class="list list-stats"></ul>
+        </div>
+        <a href="./battlegame.html" class="btn btn-dark" id="btnStart">Comenzar</a>
+      </div>
+    </div>
+
+    <script type="module" src="../scripts/index.js"></script>
+    <script type="module" src="../scripts/battleground.js"></script>
+  </body>
+</html>

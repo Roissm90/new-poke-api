@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Título</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="./styles/styles.css" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <!-- AOS CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <!-- AOS JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery UI JS -->
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <!-- jQuery UI CSS (opcional, para estilos de widgets) -->
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"
+    />
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"
+    ></script>
+    <!-- sonidos midi -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@latest/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+  </head>
+
+  <body>
+    <header>
+    <nav class="nav">
+      <div class="container-grid">
+        <div class="wrapper-image-header">
+          <img
+            src="./assets/logo_pokemon.png"
+            alt="Logo Pokemon"
+            class="image-header"
+          />
+        </div>
+        <div class="nav-logo">
+          <button class="menu-toggle" aria-label="Abrir menú">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </button>
+        </div>
+        <ul class="nav-list">
+          <li data-page="home"><a href="./index.html">Home</a></li>
+          <li data-page="pokedex"><a href="./pages/pokedex.html">Pokédex</a></li>
+          <!--<li data-page="pokemon">
+            <a href="./pages/pokemon.html">Pokémon</a>
+          </li>-->
+          <li data-page="abilities">
+            <a href="./pages/abilities.html">Abilities</a>
+          </li>
+          <li data-page="moves"><a href="./pages/moves.html">Moves</a></li>
+          <li data-page="game"><a href="./pages/game.html">Battle</a></li>
+          <li data-page="activities"><a href="./pages/activities.html">Activities</a></li>
+        </ul>
+      </div>
+    </nav>
+    </header>
+
+    <section class="first-margin hero-banner">
+      <div class="container-grid" data-aos="fade-down" data-aos-duration="600">
+        <div class="col-left">
+          <h1
+            class="title-game text-color-dark"
+            data-aos="fade-down"
+            data-aos-delay="600"
+            data-aos-duration="600"
+          >
+            descubre todo sobre pokémon
+          </h1>
+          <div class="wrapper-btns">
+            <a
+              href="#sctnSearch"
+              class="btn btn-scroll btn-dark"
+              data-aos="fade-down"
+              data-aos-duration="600"
+              data-aos-delay="900"
+              >Busca tu Pokémon</a
+            >
+            <a
+              href="./pages/pokedex.html"
+              class="btn btn-link btn-light"
+              data-aos="fade-down"
+              data-aos-duration="600"
+              data-aos-delay="1200"
+              >Explora la PokéDex</a
+            >
+          </div>
+        </div>
+        <div class="col-right" data-aos="fade-left" data-aos-duration="600" data-aos-delay="1800">
+          <img
+            src="./assets/ash_banner.png"
+            alt="Imagen Pikachu"
+            class="image-hero-banner"
+          />
+      </div>
+    </section>
+
+    <section class="section-search" id="sctnSearch">
+      <div class="container-grid">
+        <div class="col-left" data-aos-duration="600" data-aos-delay="600" data-aos="fade-right">
+          <a href="./pages/pokemon.html" class="link-pokemon-single">
+            <img id="pokemonImage" src="" alt="Pokémon" />
+            <span class="tooltip-link">Ver detalle</span>
+          </a>
+        </div>
+        <div class="col-right" data-aos-duration="600" data-aos-delay="1200" data-aos="fade-left">
+          <label for="searchPokemon" class="title-section text-color-light-two">Busca tu Pokémon</label>
+          <input id="searchPokemon" class="input-search-pokemon text-color-dark-two" type="text" placeholder="">
+          <p id="pokemonError" class="error-msg text-color-light"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sctn-moves-abilities-home">
+      <div class="container-grid">
+        <h3 class="title text-color-dark" data-aos-duration="600" data-aos="fade-down" data-aos-delay="600">Conviértete en un experto Pokémon</h3>
+        <div class="wrapper-columns">
+          <div class="col col-left" data-aos-delay="600" data-aos-duration="600" data-aos="fade-right">
+            <a href="./pages/moves.html" class="link btn btn-light">Aprende <span>todos </span>los movimientos</a>
+          </div>
+          <div class="col col-right" data-aos-delay="600" data-aos-duration="600" data-aos="fade-left">
+            <a href="./pages/abilities.html" class="link btn btn-dark">Descubre <span>todas </span>las habilidades</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sctn-destacados">
+      <div 
+        class="container-grid" 
+        data-aos="fade-down"
+        data-aos-delay="600"
+        data-aos-duration="600">
+      </div>
+      <a class="btn btn-light link-game" href="./pages/game.html" data-aos="fade-up"
+        data-aos-delay="1200"
+        data-aos-duration="600">Entrena con tu Pokémon preferido</a>
+    </section>
+
+    <script type="module" src="./scripts/index.js"></script>
+    <script type="module" src="./scripts/home.js"></script>
+  </body>
+</html>

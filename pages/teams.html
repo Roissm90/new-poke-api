@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Builder Pokémon</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../styles/styles.css" />
+
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+  <!-- AOS CSS/JS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <!-- jQuery UI (opcional) -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css" />
+  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+
+  <!-- Sonidos MIDI -->
+  <script src="https://cdn.jsdelivr.net/npm/tone@latest/build/Tone.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="container-grid">
+        <div class="wrapper-image-header">
+          <a href="../index.html">
+            <img src="../assets/logo_pokemon.png" alt="Logo Pokemon" class="image-header" />
+          </a>
+        </div>
+        <div class="nav-logo">
+          <button class="menu-toggle" aria-label="Abrir menú">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+          </button>
+        </div>
+        <ul class="nav-list">
+          <li data-page="home"><a href="../index.html">Home</a></li>
+          <li data-page="pokedex"><a href="./pokedex.html">Pokédex</a></li>
+          <li data-page="abilities"><a href="./abilities.html">Abilities</a></li>
+          <li data-page="moves"><a href="./moves.html">Moves</a></li>
+          <li data-page="game"><a href="./game.html">Battle</a></li>
+          <li data-page="activities"><a href="./activities.html">Activities</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <section class="first-margin sctn-teams">
+    <div class="container-grid">
+      <h1 class="title-team">Team Builder Pokémon</h1>
+
+      <!-- Selector para elegir Pokémon -->
+      <div class="team-builder-controls">
+        <label for="pokemon-search">Selecciona un Pokémon:</label>
+        <input type="text" id="pokemon-search" placeholder="Buscar Pokémon..." />
+        <button id="add-pokemon" class="btn btn-dark">Añadir al equipo</button>
+      </div>
+
+      <!-- Contenedor del equipo -->
+      <div id="team-container" class="team-container"></div>
+
+      <!-- Botones de acción -->
+      <div class="team-actions">
+        <button id="analyze-team" class="btn btn-secondary">Analizar equipo</button>
+        <button id="clear-team" class="btn btn-light btn-danger">Limpiar equipo</button>
+      </div>
+
+      <!-- Contenedor de análisis -->
+      <div id="analysis-container" class="analysis-container"></div>
+    </div>
+  </section>
+
+  <!-- Modal (opcional) -->
+  <div class="modal-team modal">
+    <div class="overlay">
+      <button class="close-modal text-color-dark-third"></button>
+      <h2 class="title text-color-dark-third"></h2>
+      <p class="description text-color-dark-two"></p>
+      <ul class="list-abilities-pokemon text-color-dark"></ul>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="../scripts/index.js"></script>
+  <script src="../scripts/teams.js"></script>
+</body>
+</html>

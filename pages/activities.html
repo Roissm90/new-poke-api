@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Título</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
+    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <!-- AOS CSS -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <!-- AOS JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <!-- jQuery UI JS -->
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+    <!-- jQuery UI CSS (opcional, para estilos de widgets) -->
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css"
+    />
+    <!-- sonidos midi -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@latest/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+  </head>
+
+  <body>
+    <header>
+      <nav class="nav">
+        <div class="container-grid">
+          <div class="wrapper-image-header">
+            <a href="../index.html">
+              <img
+                src="../assets/logo_pokemon.png"
+                alt="Logo Pokemon"
+                class="image-header"
+              />
+            </a>
+          </div>
+          <div class="nav-logo">
+            <button class="menu-toggle" aria-label="Abrir menú">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </button>
+          </div>
+          <ul class="nav-list">
+            <li data-page="home"><a href="../index.html">Home</a></li>
+            <li data-page="pokedex"><a href="./pokedex.html">Pokédex</a></li>
+            <!--<li data-page="pokemon"><a href="./pokemon.html">Pokemon</a></li>-->
+            <li data-page="abilities">
+              <a href="./abilities.html">Abilities</a>
+            </li>
+            <li data-page="moves"><a href="./moves.html">Moves</a></li>
+            <li data-page="game"><a href="./game.html">Battle</a></li>
+            <li data-page="activities">
+              <a href="./activities.html">Activities</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <section class="first-margin sctn-activities">
+      <div class="container-grid container-grid-list">
+        <ul class="list-activities">
+          <li class="activity-item" data-target="#activityOne">
+            Adivina el Pokémon
+          </li>
+          <li class="activity-item" data-target="#activityTwo">Parejas</li>
+          <li class="activity-item" data-target="#activityThree">
+            Evoluciones
+          </li>
+          <li class="activity-item" data-target="#activityFour">
+            Pokémon Race
+          </li>
+        </ul>
+      </div>
+      <div class="container-grid container-grid-gameboard">
+        <div class="wrapper-activity wrapper-activity-one" id="activityOne">
+          <h2 class="title-activity text-color-dark-third">
+            Adivina el Pokémon
+          </h2>
+          <div class="gameboard">
+            <ul class="list-generations">
+              <li class="item-gemeration one" data-url=""></li>
+              <li class="item-gemeration two" data-url=""></li>
+              <li class="item-gemeration three" data-url=""></li>
+              <li class="item-gemeration four" data-url=""></li>
+              <li class="item-gemeration five" data-url=""></li>
+              <li class="item-gemeration six" data-url=""></li>
+              <li class="item-gemeration seven" data-url=""></li>
+              <li class="item-gemeration eight" data-url=""></li>
+              <li class="item-gemeration nine" data-url=""></li>
+            </ul>
+            <div class="wrapper-pkmn-to-guess">
+              <div class="col-left">
+                <h3 class="name-pkmn-to-guess text-color-dark-third"></h3>
+                <div class="wrapper-image-pkmn-to-guess">
+                  <img
+                    src=""
+                    alt="pokemon-to-guess"
+                    class="pkmn-to-guess-picture silhouette"
+                  />
+                </div>
+              </div>
+              <div class="col-right">
+                <div class="wrapper-hints">
+                  <ul class="list-hints">
+                    <li class="hint hint-one" data-target="hint-one">
+                      <p class="hint-click">Reproducir sonido</p>
+                      <p class="hint-info"></p>
+                    </li>
+                    <li class="hint hint-two" data-target="hint-two">
+                      <p class="hint-click">Nº PokéDex</p>
+                      <p class="hint-info"></p>
+                    </li>
+                    <li class="hint hint-three" data-target="hint-three">
+                      <p class="hint-click">Tipo</p>
+                      <p class="hint-info"></p>
+                    </li>
+                    <li class="hint hint-four" data-target="hint-four">
+                      <p class="hint-click">Descripción</p>
+                      <p class="hint-info"></p>
+                    </li>
+                  </ul>
+                </div>
+                <div class="wrapper-label-input">
+                  <label class="text-label" for="input-guess-pkmn">
+                    <span class="">Te quedan: </span>
+                    <span class="tries-number"></span>
+                    <span class="tries-text"></span>
+                  </label>
+                  <input
+                    type="text"
+                    class="input-guess"
+                    id="input-guess-pkmn"
+                  />
+                  <button
+                    id="nextPokemonBtn"
+                    class="btn btn-dark"
+                    style="display: none"
+                  >
+                    Reiniciar
+                  </button>
+                </div>
+                <p class="msg-guess text-color-dark-third"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wrapper-activity wrapper-activity-two" id="activityTwo">
+          <h2 class="title-activity text-color-dark-third">Parejas</h2>
+          <div class="gameboard"></div>
+          <button
+            class="restart-btn-activity-two btn btn-dark"
+            id="restartBtnActivityTwo"
+          >
+            Volver a empezar
+          </button>
+        </div>
+        <div class="wrapper-activity wrapper-activity-three" id="activityThree">
+          <h2 class="title-activity text-color-dark-third">Evoluciones</h2>
+          <div class="gameboard">
+            <div class="wrapper-pkmn-base">
+              <img class="picture-pkmn-base" alt="" src="" />
+            </div>
+            <div class="wrapper-pkmn-evolutions">
+              <div class="next-evolution">
+                <img src="" alt="" class="next-evolution-picture" />
+              </div>
+              <div class="wrapper-options">
+                <div class="wrapper-option wrapper-option-one">
+                  <img class="picture picture-one" src="" alt="" />
+                </div>
+                <div class="wrapper-option wrapper-option-two">
+                  <img class="picture picture-two" src="" alt="" />
+                </div>
+                <div class="wrapper-option wrapper-option-three">
+                  <img class="picture picture-three" src="" alt="" />
+                </div>
+              </div>
+            </div>
+            <p class="msg-activity text-color-dark-third">
+              Arrastra al recuadro la solución
+            </p>
+          </div>
+        </div>
+        <div class="wrapper-activity wrapper-activity-four" id="activityFour">
+          <h2 class="title-activity text-color-dark-third">Pokémon Race</h2>
+
+          <div class="controls">
+            <div class="game-controls">
+              <button id="startBtn" class="btn btn-dark" disabled>Iniciar carrera</button>
+              <button id="resetBtn" class="btn btn-light" >Reiniciar</button>
+              <div class="status" id="status">Estado: esperando</div>
+            </div>
+          </div>
+
+          <div class="gameboard"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="modal-activity modal">
+      <div class="overlay">
+        <button class="close-modal text-color-dark-third"></button>
+        <h2 class="title text-color-dark-third"></h2>
+        <p class="description text-color-dark-two"></p>
+        <ul class="list-abilities-pokemon text-color-dark"></ul>
+      </div>
+    </div>
+
+    <script type="module" src="../scripts/index.js"></script>
+    <script type="module" src="../scripts/activities.js"></script>
+  </body>
+</html>

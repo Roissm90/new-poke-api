@@ -1,0 +1,405 @@
+.sctn-battle-game {
+  min-height: calc(100dvh - 129px);
+  display: flex;
+  align-items: center;
+
+  .container-grid {
+    .row {
+      display: flex;
+      max-width: 560px;
+      margin: 0 auto;
+      align-items: center;
+
+      &.cpu-row {
+        justify-content: flex-end;
+        margin-bottom: 3rem;
+        position: relative;
+
+        .wrapper-sprite-cpu {
+          width: fit-content;
+          height: fit-content;
+          position: relative;
+          .sprite-cpu {
+            width: clamp(90px, 25vw, 150px);
+            height: clamp(90px, 25vw, 150px);
+            object-fit: cover;
+            object-position: center;
+          }
+          &:after {
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+            display: block;
+            content: "Miss";
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            color: #cee7ff;
+            background-color: #273340;
+            z-index: -1;
+            width: fit-content;
+            height: fit-content;
+          }
+
+          &.miss {
+            &:after {
+              z-index: 10;
+              animation: shake 0.5s ease-in-out;
+            }
+          }
+
+          &:before {
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+            display: block;
+            content: "Crítico";
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            color: #cee7ff;
+            background-color: #273340;
+            z-index: -1;
+            width: fit-content;
+            height: fit-content;
+          }
+
+          &.critical {
+            &:before {
+              z-index: 10;
+            }
+          }
+        }
+
+        .info-cpu {
+          .level-cpu {
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+          }
+
+          .ps-cpu {
+            font-size: 0.8rem;
+
+            .ps-bar-cpu {
+              height: fit-content;
+              display: flex;
+              flex-wrap: nowrap;
+              align-items: center;
+              gap: 0.3rem;
+
+              .ps-bar-text-cpu {
+                font-weight: bold;
+              }
+
+              .ps-bar-visual-cpu {
+                width: 150px;
+                height: 7px;
+
+                span {
+                  display: block;
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 8px;
+                }
+              }
+            }
+          }
+        }
+
+        .info-attack-cpu {
+          font-size: 0.6rem;
+          position: absolute;
+          bottom: -1rem;
+          right: 0;
+          text-align: right;
+          border-radius: 4px;
+          padding: 0.5rem;
+          display: none;
+        }
+      }
+
+      &.player-row {
+        justify-content: flex-start;
+        position: relative;
+
+        .wrapper-sprite-player {
+          width: fit-content;
+          height: fit-content;
+          position: relative;
+
+          .sprite-player {
+            width: clamp(90px, 25vw, 150px);
+            height: clamp(90px, 25vw, 150px);
+            object-fit: cover;
+            object-position: center;
+          }
+
+          &:after {
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+            display: block;
+            content: "Miss";
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            color: #cee7ff;
+            background-color: #273340;
+            z-index: -1;
+            width: fit-content;
+            height: fit-content;
+          }
+
+          &.miss {
+            &:after {
+              z-index: 10;
+              animation: shake 1.5s ease-in-out;
+            }
+          }
+
+          &:before {
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform: translate(50%, -50%);
+            display: block;
+            content: "Crítico";
+            padding: 0.5rem;
+            font-size: 0.6rem;
+            color: #cee7ff;
+            background-color: #273340;
+            z-index: -1;
+            width: fit-content;
+            height: fit-content;
+          }
+
+          &.critical {
+            &:before {
+              z-index: 10;
+            }
+          }
+        }
+
+        .info-player {
+          .level-player {
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+          }
+
+          .ps-player {
+            font-size: 0.8rem;
+
+            .ps-bar-player {
+              height: fit-content;
+              display: flex;
+              flex-wrap: nowrap;
+              align-items: center;
+              gap: 0.3rem;
+
+              .ps-bar-text-player {
+                font-weight: bold;
+              }
+
+              .ps-bar-visual-player {
+                width: 150px;
+                height: 7px;
+
+                span {
+                  display: block;
+                  width: 100%;
+                  height: 100%;
+                  border-radius: 8px;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      &.moves-player-row {
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        .move {
+          width: calc(50% - 0.5rem);
+          padding: 0.4rem;
+          border: 1px solid #001832;
+          border-radius: 8px;
+
+          .name {
+            font-size: 0.8rem;
+            margin-bottom: 0.2rem;
+          }
+
+          .pp {
+            font-size: 0.6rem;
+            //text-align: right;
+            .actual,
+            .total {
+              font-size: 0.6rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .sctn-battle-game {
+    .container-grid {
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sctn-battle-game {
+    min-height: calc(100dvh - 89px);
+    .container-grid {
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .sctn-battle-game {
+    .container-grid {
+    }
+  }
+}
+
+.modal-battle {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -10;
+  transition: all ease-in 0.3s;
+  background-color: #001832d7;
+
+  &.show {
+    pointer-events: auto;
+    opacity: 1;
+    z-index: 1000;
+  }
+
+  .overlay {
+    position: relative;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 90vw;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 0.3s ease-in-out;
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 20px;
+      height: 20px;
+      border: none;
+      outline: none;
+      background-color: transparent;
+      z-index: 2;
+      cursor: pointer;
+
+      &:hover {
+        transform: scale(1.2);
+        transition: all ease-in 0.3s;
+      }
+
+      &:before {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        content: "";
+        display: block;
+        transform: rotate(45deg) translateY(-50%);
+        width: 20px;
+        height: 2px;
+        border-radius: 5px;
+        background-color: #000;
+      }
+
+      &:after {
+        position: absolute;
+        bottom: 50%;
+        left: 0;
+        content: "";
+        display: block;
+        transform: rotate(-45deg) translateY(50%);
+        width: 20px;
+        height: 2px;
+        border-radius: 5px;
+        background-color: #000;
+      }
+    }
+
+    .title {
+      font-size: 1.4rem;
+      margin: 0 auto 1rem;
+      text-align: center;
+    }
+
+    .picture {
+      width: 50%;
+      max-width: 320px;
+      margin: 0 auto;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    .btn {
+      width: 100%;
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      text-align: center;
+      display: block;
+    }
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(50%, -50%);
+  }
+  10% {
+    transform: translate(calc(50% - 5px), -50%);
+  }
+  20% {
+    transform: translate(calc(50% + 5px), -50%);
+  }
+  30% {
+    transform: translate(calc(50% - 5px), -50%);
+  }
+  40% {
+    transform: translate(calc(50% + 5px), -50%);
+  }
+  50% {
+    transform: translate(calc(50% - 5px), -50%);
+  }
+  60% {
+    transform: translate(calc(50% + 5px), -50%);
+  }
+  70% {
+    transform: translate(calc(50% - 5px), -50%);
+  }
+  80% {
+    transform: translate(calc(50% + 5px), -50%);
+  }
+  90% {
+    transform: translate(calc(50% - 5px), -50%);
+  }
+  100% {
+    transform: translate(50%, -50%);
+  }
+}

@@ -1,0 +1,17 @@
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails and metadata
+._*
+
+# Trash folder
+.Trashes
+
+# Temporary files
+.Spotlight-V100
+.TemporaryItems
+
+# Time Machine
+.DocumentRevisions-V100
