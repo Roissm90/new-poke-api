@@ -22,6 +22,21 @@ Si ya estan instaladas las dependencias y no ha cambiado el archivo de bloqueo,
 no es necesario repetir `npm install`. Para instalaciones reproducibles usa
 `npm ci`. No abras el HTML mediante `file://`: los modulos necesitan un servidor.
 
+## GitHub Pages
+
+En Settings > Pages, publica desde la rama `main` y la carpeta raiz (`/`).
+El archivo `.nojekyll` debe estar en esa raiz y subido al repositorio: desactiva
+Jekyll para que se publiquen tambien los recursos de `node_modules` usados por
+Lucide y Odometer. Sin el marcador, esos archivos pueden dar 404 y los modulos
+que inicializan la interfaz no llegan a ejecutarse.
+
+Sube el CSS generado y las dependencias locales versionadas junto con la web.
+Espera a que termine el despliegue en Actions y recarga sin cache. GitHub Pages
+solo sirve archivos estaticos: no ejecuta `server.cjs`, `npm start` ni la
+generacion de previews descrita abajo. Las previews para Pages necesitan
+metadatos escritos en el HTML o generados antes del despliegue, no en Node al
+recibir una peticion.
+
 ## Compartir
 
 El servidor incluye metadatos Open Graph y Twitter en el HTML de Inicio y de
