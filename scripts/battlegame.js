@@ -1,5 +1,8 @@
 import { types } from "./types.js";
 import { reproducirBattleMidi, detenerMidi } from "./sounds.js";
+import { reveal } from "./motion.js";
+import { usableBattleMoves, battleMoveName } from "./game-data.mjs";
+import { typeBadgeMarkup } from "./type-badges.mjs";
 
 //console.log(types);
 
@@ -10,16 +13,12 @@ let cpuMaxHP;
 let victoryPicturePlayer;
 let victoryPictureCPU;
 const level = 50;
+let turnBusy = false;
+let battleFinished = false;
+let cpuBattleMoves = [];
 
 $(window).on("load", async function () {
   //await reproducirBattleMidi();
-  AOS.init({
-    duration: 800,
-    easing: "ease-in-out-sine",
-    once: true,
-    mirror: false,
-  });
-
   const closeModal = $(".modal-battle .close-modal");
   closeModal.click(function (e) {
     e.preventDefault();
@@ -32,14 +31,18 @@ $(window).on("load", async function () {
   const pkmnCPUstrMoves = localStorage.getItem("cpuMoves");
 
   if (!pkmnStr || !pkmnCPUstr || !pkmnStrMoves || !pkmnCPUstrMoves) {
-    $("#battle-container").html("<p>No hay Pokémon seleccionados.</p>");
+    $(".sctn-battle-game .container-grid").html('<h1>Combate</h1><p>No hay un combate preparado.</p><a href="./game.html" class="btn btn-dark">Elegir Pokémon</a>');
     return;
   }
 
   const player = JSON.parse(pkmnStr);
   const cpu = JSON.parse(pkmnCPUstr);
-  const playerMoves = JSON.parse(pkmnStrMoves);
-  const cpuMoves = JSON.parse(pkmnCPUstrMoves);
+  const playerMoves = usableBattleMoves(JSON.parse(pkmnStrMoves));
+  cpuBattleMoves = usableBattleMoves(JSON.parse(pkmnCPUstrMoves)).map((move) => ({ ...move }));
+  if (!playerMoves.length || !cpuBattleMoves.length) {
+    $(".sctn-battle-game .container-grid").html('<h1>Combate</h1><p>No hay ataques preparados para este enfrentamiento.</p><a href="./game.html" class="btn btn-dark">Elegir Pokémon</a>');
+    return;
+  }
 
   async function getBackSprite(pokemonId) {
     try {
@@ -73,11 +76,13 @@ $(window).on("load", async function () {
   const cpuFrontSprite = await getFrontSprite(cpu.id);
   victoryPictureCPU = cpuFrontSprite;
 
-  $(".sprite-player").attr("src", playerBackSprite);
-  $(".sprite-cpu").attr("src", cpuFrontSprite);
+  $(".sprite-player").attr({ src: playerBackSprite || playerFrontSprite || player.image, alt: player.name });
+  $(".sprite-cpu").attr({ src: cpuFrontSprite || cpu.image, alt: cpu.name });
+  $(".info-player").prepend($("<h2 class='combatant-name'>").text(player.name));
+  $(".info-cpu").prepend($("<h2 class='combatant-name'>").text(cpu.name));
 
-  $(".level-player").text(`Lv:${level}`);
-  $(".level-cpu").text(`Lv:${level}`);
+  $(".level-player").text(`Nivel ${level}`);
+  $(".level-cpu").text(`Nivel ${level}`);
 
   // HP escalada con nivel
   playerMaxHP = Math.round(
@@ -94,19 +99,34 @@ $(window).on("load", async function () {
   $(".ps-text-total-player").text(playerMaxHP);
   $(".ps-text-actual-cpu").text(cpuCurrentHP);
   $(".ps-text-total-cpu").text(cpuMaxHP);
+  $("#battleStatus").text("Tu turno");
+
+  function updateButtons() {
+    $(".moves-player-row .move").each(function (index) {
+      const remaining = Number($(this).find(".pp .actual").text());
+      $(this).prop("disabled", turnBusy || battleFinished || !playerMoves[index] || remaining <= 0);
+    });
+    if (!turnBusy && !battleFinished && !$(".moves-player-row .move:not(:disabled)").length) {
+      $("#battleStatus").text("No quedan PP disponibles. El combate no puede continuar.");
+    }
+  }
 
   // Configuración de los movimientos del jugador
   for (let i = 0; i < 4; i++) {
     const move = playerMoves[i];
     if (move) {
       const $moveDiv = $(`.move-${i + 1}`);
-      $moveDiv.find(".name").text(move.nameES);
+      $moveDiv.find(".name").text(battleMoveName(move));
+      $moveDiv.find(".pp").prepend(typeBadgeMarkup(move.type), document.createTextNode(" PP "));
       $moveDiv.find(".pp .actual").text(move.pp);
       $moveDiv.find(".pp .total").text(move.pp);
 
-      $moveDiv.off("click").on("click", function () {
+      $moveDiv.off("click").on("click", async function () {
+        if (turnBusy || battleFinished) return;
         let currentPP = parseInt($moveDiv.find(".pp .actual").text());
         if (currentPP > 0) {
+          turnBusy = true;
+          updateButtons();
           currentPP--;
           $moveDiv.find(".pp .actual").text(currentPP);
 
@@ -118,21 +138,28 @@ $(window).on("load", async function () {
 
           if (playerAttacksFirst) {
             atacarJugador(move, player, cpu);
+            await new Promise((resolve) => setTimeout(resolve, 600));
             if (cpuCurrentHP > 0) {
-              setTimeout(() => ataqueCPU(cpu, player), 600);
+              ataqueCPU(cpu, player);
             }
           } else {
             ataqueCPU(cpu, player);
+            await new Promise((resolve) => setTimeout(resolve, 600));
             if (playerCurrentHP > 0) {
-              setTimeout(() => atacarJugador(move, player, cpu), 600);
+              atacarJugador(move, player, cpu);
             }
           }
+          await new Promise((resolve) => setTimeout(resolve, 600));
+          turnBusy = false;
+          if (playerCurrentHP > 0 && cpuCurrentHP > 0) $("#battleStatus").text("Tu turno");
+          updateButtons();
         }
       });
     } else {
-      $(`.move-${i + 1} .name`).text("");
+      $(`.move-${i + 1}`).prop("hidden", true).prop("disabled", true);
     }
   }
+  updateButtons();
 });
 
 // Función de cálculo de daño
@@ -142,12 +169,13 @@ function calcularDaño({
   defensa,
   poder,
   tipoPokemon,
+  tiposAtacante,
   tipoAtaque,
   defensor,
   atacante,
   ui,
 }) {
-  const B = tipoPokemon.includes(tipoAtaque) ? 1.5 : 1; // STAB
+  const B = tiposAtacante.includes(tipoAtaque) ? 1.5 : 1; // STAB
 
   //console.log('ataque de atacante: ' + ataque);
   //console.log('defensa de defensor: ' + defensa);
@@ -201,15 +229,19 @@ function calcularDaño({
 
 // Función para mostrar modal de ganador
 function mostrarModalGanador(nombreGanador, spriteGanador) {
+  battleFinished = true;
+  $(".moves-player-row .move").prop("disabled", true);
   detenerMidi();
   const $modal = $(".modal-battle");
-  $modal.find(".title").text(`${nombreGanador} ha ganado la batalla!`);
-  $modal.find(".picture").attr("src", spriteGanador);
+  $modal.find(".title").text(`${nombreGanador} gana la batalla`);
+  $modal.find(".picture").attr({ src: spriteGanador, alt: nombreGanador });
+  $("#battleStatus").text(`Combate terminado: gana ${nombreGanador}`);
   $modal.addClass("show");
 }
 
 // Ataque del jugador
 function atacarJugador(move, player, cpu) {
+  $("#battleStatus").text(`${player.name} usa ${battleMoveName(move)}`);
   const tipoAtaque = move.type;
   const poder = move.power || 0;
   const ataquePlayer =
@@ -227,6 +259,7 @@ function atacarJugador(move, player, cpu) {
     defensa: defensaCPU,
     poder: poder,
     tipoPokemon: cpu.types.map((t) => t.nameEN),
+    tiposAtacante: player.types.map((type) => type.nameEN),
     tipoAtaque,
     defensor: $(".wrapper-sprite-cpu"),
     atacante: $(".wrapper-sprite-player"),
@@ -245,24 +278,23 @@ function atacarJugador(move, player, cpu) {
 
   if (cpuCurrentHP === 0) {
     setTimeout(() => {
-      mostrarModalGanador(player.name, victoryPicturePlayer);
+      mostrarModalGanador(player.name, player.image || victoryPicturePlayer);
     }, 500);
   }
 }
 
 // Ataque CPU
 function ataqueCPU(cpu, player) {
-  const validMoves = cpu.moves.filter(
-    (m) =>
-      m.power !== null &&
-      (m.damage_class === "physical" || m.damage_class === "special")
-  );
+  const validMoves = cpuBattleMoves.filter((move) => move.pp > 0);
   let move;
   if (validMoves.length > 0) {
     move = validMoves[Math.floor(Math.random() * validMoves.length)];
   } else {
-    console.warn(`⚠ ${cpu.name} no tiene ataques con potencia definida.`);
+    $("#battleStatus").text(`${cpu.name} no tiene PP disponibles`);
+    return;
   }
+  move.pp -= 1;
+  $("#battleStatus").text(`${cpu.name} usa ${battleMoveName(move)}`);
 
   const tipoAtaque = move.type;
   const poder = move.power || 0;
@@ -282,6 +314,7 @@ function ataqueCPU(cpu, player) {
     defensa: defensaPlayer,
     poder: poder,
     tipoPokemon: player.types.map((t) => t.nameEN),
+    tiposAtacante: cpu.types.map((type) => type.nameEN),
     tipoAtaque,
     defensor: $(".wrapper-sprite-player"),
     atacante: $(".wrapper-sprite-cpu"),
@@ -289,8 +322,8 @@ function ataqueCPU(cpu, player) {
   });
 
   const $mensajeCPU = $(".cpu-row .info-attack-cpu");
-  $mensajeCPU.text(`${cpu.name} usó: ${move.nameES}`).fadeIn();
-  setTimeout(() => $mensajeCPU.fadeOut(), 3000);
+  reveal($mensajeCPU.text(`${cpu.name} usa ${battleMoveName(move)}`));
+  setTimeout(() => $mensajeCPU.hide(), 3000);
 
   playerCurrentHP -= daño;
   if (playerCurrentHP < 0) playerCurrentHP = 0;
@@ -304,7 +337,7 @@ function ataqueCPU(cpu, player) {
 
   if (playerCurrentHP === 0) {
     setTimeout(() => {
-      mostrarModalGanador(cpu.name, victoryPictureCPU);
+      mostrarModalGanador(cpu.name, cpu.image || victoryPictureCPU);
     }, 500);
   }
 }

@@ -131,12 +131,6 @@
       flex-direction: column;
       gap: 2rem;
 
-      .title-section {
-        font-size: 2rem;
-        border-bottom: 2px solid #b5d9fb;
-        padding-bottom: 0;
-        text-wrap: nowrap;
-      }
       .input-search-pokemon {
         width: 100%;
         max-width: 308px;
@@ -177,10 +171,6 @@
         width: fit-content;
         position: relative;
 
-        .title-section {
-          font-size: 1.2rem;
-        }
-
         .error-msg {
           position: absolute;
           top: 110%;
@@ -193,14 +183,6 @@
 
 .sctn-moves-abilities-home {
   .container-grid {
-    .title {
-      margin: 0 auto 2rem;
-      border-bottom: 2px solid #132232;
-      padding-bottom: 0;
-      font-size: 2rem;
-      width: fit-content;
-    }
-
     .wrapper-columns {
       display: flex;
       justify-content: flex-start;
@@ -224,11 +206,6 @@
 @media (max-width: 768px) {
   .sctn-moves-abilities-home {
     .container-grid {
-      .title {
-        margin-bottom: 1.2rem;
-        font-size: 1.5rem;
-        border: none;
-      }
 
       .wrapper-columns {
         flex-direction: column;

@@ -10,7 +10,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
-    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../styles/atlas.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <!-- AOS CSS -->
     <link
       rel="stylesheet"
@@ -66,20 +67,21 @@
       </nav>
     </header>
 
-    <section class="first-margin sctn-game">
-      <div class="container-grid" data-aos="fade-up"
-        data-aos-delay="1200"
-        data-aos-duration="600">
+    <section class="first-margin sctn-game" data-aos="fade-up">
+      <div class="container-grid">
         <div class="filters">
           <input
             type="text"
             class="input-search"
             placeholder="Nombre o Nº PokéDex"
             id="searchInputPokedex"
-            data-aos="fade-right"
+            aria-label="Buscar Pokémon por nombre o número"
           />
         </div>
-        <div class="list-pokemon" data-aos="fade-up" data-aos-duration="600"></div>
+        <p class="catalog-summary" id="battleCatalogStatus" role="status" aria-live="polite"></p>
+        <div class="list-pokemon" aria-busy="true"></div>
+        <nav class="pokedex-pagination" aria-label="Páginas de Pokémon para combatir"></nav>
+        <p class="catalog-summary" id="battlePageSummary"></p>
       </div>
     </section>
 
@@ -99,6 +101,7 @@
           <li class="stat-item speed text-color-dark-third"></li>
         </ul>
         </div>
+        <p id="battleSelectionStatus" role="status" aria-live="polite"></p>
         <a href="./battleground.html" class="btn btn-dark" id="battleBtn">Entrenar</a>
       </div>
     </div>

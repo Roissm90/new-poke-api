@@ -3,16 +3,27 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "scss": "sass styles/styles.scss styles/styles.css --watch"
+    "dev": "node server.cjs",
+    "start": "node server.cjs",
+    "test": "node --test tests/*.test.mjs",
+    "update:moves-index": "node scripts/update-moves-index.mjs",
+    "build": "sass --no-source-map styles/styles.scss:styles/styles.css styles/atlas.scss:styles/atlas.css",
+    "scss": "sass --watch --no-source-map styles/styles.scss:styles/styles.css styles/atlas.scss:styles/atlas.css"
+  },
+  "devDependencies": {
+    "csv-parse": "^7.0.3",
+    "sass": "^1.93.0"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cheerio": "^1.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "node-fetch": "^2.7.0"
+    "lucide": "^0.468.0",
+    "node-fetch": "^2.7.0",
+    "odometer": "^0.4.8"
   }
 }

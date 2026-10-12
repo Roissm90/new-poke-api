@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Título</title>
+    <title>Pokédex | Pokémon Atlas</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
-    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../styles/atlas.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <!-- AOS CSS -->
     <link
       rel="stylesheet"
@@ -80,22 +81,27 @@
     </nav>
     </header>
 
-    <section class="first-margin sctn-pokedex">
+    <section class="first-margin sctn-pokedex" data-aos="fade-up">
       <div class="container-grid">
+        <div class="dex-heading">
+          <div><p class="eyebrow">EL CATÁLOGO · GENERACIONES I–IX</p><h1>Pokédex</h1><p>Encuentra a tu próximo favorito.</p></div>
+          <span id="pokemonCount" class="catalog-count">1.025 Pokémon</span>
+        </div>
         <div class="filters">
+          <label class="search-field" for="searchInputPokedex"><span>Buscar Pokémon</span>
           <input
             type="text"
             class="input-search"
             placeholder="Nombre o Nº PokéDex"
             id="searchInputPokedex"
-            data-aos="fade-right"
           />
+          </label>
           <div class="types-filter" ></div>
         </div>
 
-        <div class="pokemon-cards-grid"></div>
-
-        <button class="btn-ver-mas bg-color-light-third text-color-dark-third">Ver más</button>
+        <div class="dex-results"><p id="pokedexStatus" role="status" aria-live="polite"></p><span id="pageSummary"></span></div>
+        <div class="pokemon-cards-grid" aria-label="Resultados de la Pokédex"></div>
+        <nav class="pokedex-pagination" aria-label="Paginación de Pokémon"></nav>
       </div>
     </section>
 

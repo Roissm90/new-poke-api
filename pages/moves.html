@@ -10,7 +10,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
-    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../styles/atlas.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <!-- AOS CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
     <!-- AOS JS -->
@@ -60,14 +61,14 @@
     </nav>
     </header>
 
-    <section class="first-margin sctn-moves">
+    <section class="first-margin sctn-moves" data-aos="fade-up">
       <div class="container-grid">
         <div class="search-container">
           <input
             type="text"
             id="search-move"
-            placeholder="Buscar movimiento..."
-            aria-label="Buscar movimiento"
+            placeholder="Nombre o MT"
+            aria-label="Buscar movimiento por nombre o MT"
           />
         </div>
         <ul class="list-moves"></ul>
@@ -78,11 +79,13 @@
       <div class="overlay">
         <button class="close-modal text-color-dark-third"></button>
         <h2 class="title text-color-dark-third"></h2>
-        <p class="damage-class text-color-dark-two"></p>
-        <p class="power text-color-dark-two"></p>
+        <dl class="move-details">
+          <div><dt>Categoría</dt><dd class="damage-class"></dd></div>
+          <div><dt>Potencia</dt><dd class="power"></dd></div>
+          <div><dt>Precisión</dt><dd class="accuracy"></dd></div>
+          <div><dt>PP</dt><dd class="pp"></dd></div>
+        </dl>
         <p class="description text-color-dark-two"></p>
-        <p class="accuracy text-color-dark-two"></p>
-        <p class="pp text-color-dark-two"></p>
         <ul class="list-moves-types text-color-dark"></ul>
       </div>
     </div>

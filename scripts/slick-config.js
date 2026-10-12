@@ -1,49 +1,38 @@
+import { iconMarkup } from "./icons.js";
+
 // slick-config.js
 export function initSlickGallery($grid) {
   if (!$grid.hasClass("slick-initialized")) {
     $grid.slick({
-      slidesToShow: 5,
+      slidesToShow: 3,
       slidesToScroll: 1,
-      centerPadding: "2rem",
+      centerPadding: "0",
       infinite: true,
       arrows: true,
       dots: false,
+      prevArrow: `<button type="button" class="slick-prev" aria-label="Pokémon anterior" title="Pokémon anterior">${iconMarkup("previous")}</button>`,
+      nextArrow: `<button type="button" class="slick-next" aria-label="Pokémon siguiente" title="Pokémon siguiente">${iconMarkup("next")}</button>`,
+      customPaging: (slider, index) => `<button type="button" aria-label="Ir al Pokémon ${index + 1}">${iconMarkup("dot")}</button>`,
       centerMode: true,
       responsive: [
         {
           breakpoint: 991,
           settings: {
-            slidesToShow: 3,
+            slidesToShow: 2,
             slidesToScroll: 1,
-            centerPadding: "1rem",
+            centerPadding: "0",
             infinite: true,
             arrows: false,
-            dots: true,
+            dots: false,
             centerMode: true,
           },
         },
         {
-          breakpoint: 769,
+          breakpoint: 640,
           settings: {
             slidesToShow: 1,
-            slidesToScroll: 1,
-            centerPadding: "1rem",
-            infinite: true,
             arrows: false,
-            dots: true,
-            centerMode: true,
-          },
-        },
-        {
-          breakpoint: 430,
-          settings: {
-            slidesToShow: 1,
-            slidesToScroll: 1,
-            centerPadding: "1rem",
-            infinite: true,
-            arrows: false,
-            dots: true,
-            centerMode: true,
+            dots: false,
           },
         },
       ],

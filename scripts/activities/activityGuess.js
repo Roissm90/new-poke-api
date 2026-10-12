@@ -1,3 +1,5 @@
+import { reveal } from "../motion.js";
+
 let hintsRevealed = 0; // Lo subimos al scope global de este módulo
 let tries = 3; // También lo subimos para poder reiniciar
 let pkmnToGuessGlobal = null; // Guardaremos el Pokémon actual
@@ -16,7 +18,7 @@ export function initGame(pkmnToGuess, species, onNextPokemon = null) {
   const nextBtn = $("#nextPokemonBtn");
 
   // Ocultamos el botón cada vez que empezamos un nuevo juego
-  nextBtn.hide();
+  nextBtn.hide().prop("disabled", false);
 
   // Reset visual
   $(".hint-info").removeClass("revealed");
@@ -46,9 +48,17 @@ export function initGame(pkmnToGuess, species, onNextPokemon = null) {
     }
     if (pkmnToGuess && pkmnToGuess.cry) {
       const audio = new Audio(pkmnToGuess.cry);
-      audio.play();
+      audio.play().catch(() => { hintOne.attr("aria-label", "Audio no disponible"); });
     }
   });
+
+  hintInfos.add(hintOne).attr({ role: "button", tabindex: "0" })
+    .off("keydown.guess").on("keydown.guess", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        $(this).trigger("click");
+      }
+    });
 
   // Click sobre la imagen del Pokémon
   imgPkmn.off("click").on("click", function () {
@@ -60,7 +70,12 @@ export function initGame(pkmnToGuess, species, onNextPokemon = null) {
 
   // Botón de jugar con otro Pokémon
   nextBtn.off("click").on("click", function () {
-    if (onNextPokemon) onNextPokemon();
+    if (onNextPokemon && !nextBtn.prop("disabled")) {
+      nextBtn.prop("disabled", true);
+      input.prop("disabled", true);
+      msg.text("Cargando Pokémon…");
+      onNextPokemon();
+    }
   });
 
   // Input para adivinar
@@ -77,12 +92,12 @@ export function initGame(pkmnToGuess, species, onNextPokemon = null) {
       }
 
       if (guess === pkmnToGuess.name.toLowerCase()) {
-        msg.text(`¡Enhorabuena! Lo adivinaste con: ${hintsRevealed} pistas`);
+        msg.text(`¡Enhorabuena! Lo adivinaste con: ${hintsRevealed} ${hintsRevealed === 1 ? "pista" : "pistas"}`);
         input.prop("disabled", true);
         $(".hint-info").not(".revealed").addClass("revealed");
         $(".name-pkmn-to-guess").addClass("revealed");
         $(".pkmn-to-guess-picture").addClass("revealed");
-        nextBtn.fadeIn();
+        reveal(nextBtn);
       } else {
         tries--;
         triesNumber.text(tries);
@@ -94,7 +109,7 @@ export function initGame(pkmnToGuess, species, onNextPokemon = null) {
           $(".name-pkmn-to-guess").addClass("revealed");
           msg.text("¡Se acabaron los intentos! Inténtalo otra vez.");
           input.prop("disabled", true);
-          nextBtn.fadeIn();
+          reveal(nextBtn);
         } else {
           msg.text("Inténtalo otra vez.");
         }

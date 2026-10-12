@@ -1,246 +1,162 @@
-import { reproducirIntroMidi } from "./sounds.js";
+import { createPokedexData, filterCatalog, PAGE_SIZE, TYPE_NAMES } from "./pokedex-data.mjs";
+import { icon } from "./icons.js";
+import { typeBadgeMarkup } from "./type-badges.mjs";
+import { reveal } from "./motion.js";
 
-$(window).on("load", async function () {
-  //await reproducirIntroMidi();
-  // Inicializar AOS
-  AOS.init({
-    duration: 800,
-    easing: "ease-in-out-sine",
-    once: true,
-    mirror: false,
-  });
+$(async function () {
+  const data = createPokedexData();
+  const $grid = $(".pokemon-cards-grid");
+  const $status = $("#pokedexStatus");
+  const $pagination = $(".pokedex-pagination");
+  let catalog = [];
+  let filtered = [];
+  let page = 1;
+  let search = "";
+  let type = "all";
+  let revision = 0;
+  let searchTimer;
 
-  const typeMap = {
-    Normal: "normal",
-    Lucha: "fighting",
-    Volador: "flying",
-    Veneno: "poison",
-    Tierra: "ground",
-    Roca: "rock",
-    Bicho: "bug",
-    Fantasma: "ghost",
-    Acero: "steel",
-    Fuego: "fire",
-    Agua: "water",
-    Planta: "grass",
-    Eléctrico: "electric",
-    Psíquico: "psychic",
-    Hielo: "ice",
-    Dragón: "dragon",
-    Siniestro: "dark",
-    Hada: "fairy",
-  };
-
-  /*** VARIABLES GLOBALES ***/
-  const $section = $(".sctn-pokedex");
-  const $grid = $section.find(".pokemon-cards-grid").first(); // solo contenedor de cards
-  const $typesContainer = $section.find(".types-filter");
-  const $inputSearch = $section.find("#searchInputPokedex");
-  const $btnVerMas = $section.find(".btn-ver-mas");
-
-  const apiBase = "https://pokeapi.co/api/v2/pokemon?limit=1025";
-  const limit = 20;
-  let offset = 0;
-  let allPokemons = [];
-  let filteredPokemons = [];
-  let currentFilterType = "all";
-  let currentSearch = "";
-
-  /*** SPINNER DE CARGA ***/
-  const $spinner = $(`
-    <div class="spinner bg-color-light">
-        <div class="wrapper-bounces bg-color-dark"></div>
-        <p class="bg-color-dark">Cargando Pokédex...</p>
-    </div>
-  `);
-  $section.prepend($spinner);
-
-  /*** UTILS: obtener nombre de tipo en español ***/
-  async function getTypeNameES(url) {
-    try {
-      const typeData = await $.ajax({ url, method: "GET" });
-      return (
-        typeData.names.find((n) => n.language.name === "es")?.name ||
-        typeData.name
-      );
-    } catch {
-      return "";
+  function pagination() {
+    const total = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const start = Math.max(1, Math.min(page - 1, total - 2));
+    const end = Math.min(total, start + 2);
+    $pagination.empty();
+    const button = (label, target, disabled, accessibleLabel = label, iconName = null) => {
+      const $button = $("<button>").text(label).attr("aria-label", accessibleLabel)
+        .prop("disabled", disabled).toggleClass("current", target === page && !disabled);
+      $button.attr("title", accessibleLabel);
+      if (iconName) $button.empty().append(icon(iconName));
+      if (target === page && !disabled) $button.attr("aria-current", "page");
+      $button.on("click", () => {
+        page = target;
+        render();
+        document.querySelector(".dex-heading").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      $pagination.append($button);
+    };
+    button("", page - 1, page === 1, "Página anterior", "previous");
+    if (start > 1) button("1", 1, false, "Página 1");
+    if (start > 2) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    for (let number = start; number <= end; number += 1) {
+      button(String(number), number, false, `Página ${number}`);
     }
+    if (end < total - 1) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    if (end < total) button(String(total), total, false, `Página ${total}`);
+    button("", page + 1, page === total, "Página siguiente", "next");
+    $("#pageSummary").text(`Página ${page} de ${total}`);
   }
 
-  async function getAbilityNameES(url) {
-    try {
-      const data = await $.ajax({ url, method: "GET" });
-      return (
-        data.names.find((n) => n.language.name === "es")?.name || data.name
-      );
-    } catch {
-      return "";
+  async function render() {
+    const token = ++revision;
+    const entries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    $grid.attr("aria-busy", "true").empty();
+    pagination();
+    $("#pokemonCount").text(`${filtered.length.toLocaleString("es")} Pokémon`);
+    $status.text(entries.length ? "Cargando Pokémon…" : "No hay Pokémon con estos filtros.");
+    if (!entries.length) {
+      $grid.attr("aria-busy", "false");
+      return;
     }
-  }
-
-  /*** CARGAR TODOS LOS POKÉMON ***/
-  async function fetchAllPokemons() {
-    try {
-      const res = await fetch(apiBase);
-      const data = await res.json();
-
-      const promises = data.results.map(async (poke) => {
+    entries.forEach(() => $grid.append('<div class="pokemon-skeleton" aria-hidden="true"></div>'));
+    const results = await Promise.allSettled(entries.map((entry) => data.pokemon(entry, true)));
+    if (token !== revision) return;
+    $grid.empty().attr("aria-busy", "false");
+    let failures = 0;
+    results.forEach((result, index) => {
+      if (result.status !== "fulfilled") {
+        failures += 1;
+        $grid.append($("<button class='pokemon-retry'>").text(`Reintentar ${entries[index].name}`).on("click", render));
+        return;
+      }
+      const pokemon = result.value;
+      const $card = $("<a class='pokemon-card'>").attr("href", "./pokemon.html")
+        .attr("aria-label", `Ver ${pokemon.name}, número ${pokemon.id}`)
+        .attr("data-pokemon-type", pokemon.classTypePrimary);
+      $card.append($("<p class='pokemon-id'>").text(`#${String(pokemon.id).padStart(4, "0")}`));
+      $card.append($("<img class='pokemon-img'>").attr({
+        src: pokemon.image, alt: pokemon.name, width: 200, height: 200, decoding: "async",
+      }));
+      $card.append($("<h3 class='pokemon-name'>").text(pokemon.name.replaceAll("-", " ")));
+      const $types = $("<div class='pokemon-types'>");
+      pokemon.types.forEach((name) => $types.append(typeBadgeMarkup(name)));
+      $card.append($types);
+      $card.on("click", async (event) => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+          localStorage.setItem("pokemonSeleccionado", JSON.stringify(pokemon));
+          return;
+        }
+        event.preventDefault();
+        if ($card.attr("aria-busy") === "true") return;
+        $card.attr("aria-busy", "true");
+        $status.text(`Abriendo ${pokemon.name}…`);
         try {
-          const response = await fetch(poke.url);
-          if (!response.ok) throw new Error("No se pudo cargar");
-          const info = await response.json();
-
-          const typesES = await Promise.all(
-            info.types.map((t) => getTypeNameES(t.type.url))
-          );
-          const abilitiesES = await Promise.all(
-            info.abilities.map((a) => getAbilityNameES(a.ability.url))
-          );
-
-          return {
-            id: info.id,
-            name: info.name,
-            image: info.sprites.other["official-artwork"].front_default,
-            types: typesES,
-            classTypePrimary: info.types[0].type.name,
-            classTypeSecondary: info.types[1]?.type.name || null,
-            abilities: abilitiesES,
-            stats: info.stats.map((s) => ({
-              name: s.stat.name,
-              base: s.base_stat,
-            })),
-            weight: info.weight,
-            height: info.height,
-            description: "", // Podrías completar con species si quieres
-            cries: {
-              latest: `https://play.pokemonshowdown.com/audio/cries/${info.name.toLowerCase()}.mp3`,
-            }, // URL del grito
-          };
-        } catch (err) {
-          console.warn(`Error cargando Pokémon: ${poke.name}`, err);
-          return null;
+          const detail = await data.detail(entries[index]);
+          localStorage.setItem("pokemonSeleccionado", JSON.stringify(detail));
+          window.location.href = "./pokemon.html";
+        } catch {
+          $card.attr("aria-busy", "false");
+          $status.text("No se pudo abrir la ficha. Vuelve a intentarlo.");
         }
       });
+      $grid.append($card);
+    });
+    const first = (page - 1) * PAGE_SIZE + 1;
+    reveal($grid);
+    reveal($pagination);
+    $status.text(failures ? `${failures} Pokémon no se han podido cargar. Puedes reintentarlos.` : `Mostrando ${first}–${first + entries.length - 1} de ${filtered.length}`);
+    filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).forEach((entry) => {
+      data.pokemon(entry).then((pokemon) => {
+        const image = new Image();
+        image.src = pokemon.image;
+      }).catch(() => {});
+    });
+  }
 
-      const allData = await Promise.all(promises);
-      allPokemons = allData
-        .filter((p) => p !== null)
-        .sort((a, b) => a.id - b.id);
-      filteredPokemons = [...allPokemons];
-
-      createTypeButtons();
-      renderPokemons();
-
-      $spinner.hide();
-    } catch (error) {
-      console.error("Error al cargar todos los Pokémon:", error);
-      $spinner.find("p").text("Error al cargar la Pokédex");
+  async function applyFilters() {
+    const token = ++revision;
+    page = 1;
+    $status.text("Aplicando filtros…");
+    $grid.attr("aria-busy", "true");
+    try {
+      const ids = type === "all" ? null : await data.typeIds(type);
+      if (token !== revision) return;
+      filtered = filterCatalog(catalog, search, ids);
+      render();
+    } catch {
+      if (token !== revision) return;
+      $grid.attr("aria-busy", "false");
+      $status.empty().append("No se pudo cargar el filtro. ", $("<button>").text("Reintentar").on("click", applyFilters));
     }
   }
 
-  /*** CREAR BOTONES DE FILTRO POR TIPO ***/
-  function createTypeButtons() {
-    const allTypes = new Set();
-    allPokemons.forEach((p) => p.types.forEach((t) => allTypes.add(t)));
-    const sortedTypes = Array.from(allTypes).sort();
-
-    const $btnAll = $(
-      '<button class="btn-type active" data-aos="fade-left" data-type="all">Todos</button>'
-    );
-    $btnAll.on("click", () => handleFilterType("all"));
-    $typesContainer.empty().append($btnAll);
-
-    sortedTypes.forEach((type) => {
-      const typeEN =
-        allPokemons.find((p) => p.types.includes(type))?.classTypePrimary ||
-        type;
-
-      const $btn = $(`
-        <button data-aos="fade-left" class="text-color-black btn-type type-${typeMap[type]}" data-type="${type}">${type}</button>
-     `);
-
-      $btn.on("click", () => handleFilterType(type));
-      $typesContainer.append($btn);
+  $("#searchInputPokedex").on("input", function () {
+    search = this.value;
+    clearTimeout(searchTimer);
+    revision += 1;
+    searchTimer = setTimeout(applyFilters, 180);
+  });
+  const $types = $(".types-filter");
+  Object.entries({ all: "Todos", ...TYPE_NAMES }).forEach(([key, name]) => {
+    const $button = $("<button class='btn-type'>").html(key === "all" ? name : typeBadgeMarkup(key))
+      .attr({ title: name, "aria-label": name }).attr("aria-pressed", key === "all")
+      .attr("data-type", key).toggleClass("active", key === "all");
+    $button.on("click", () => {
+      type = key;
+      $types.find("button").removeClass("active").attr("aria-pressed", "false");
+      $button.addClass("active").attr("aria-pressed", "true");
+      applyFilters();
     });
-  }
-
-  function handleFilterType(type) {
-    $(".btn-type").removeClass("active");
-    $(`.btn-type[data-type="${type}"]`).addClass("active");
-    currentFilterType = type;
-    applyFilters();
-  }
-
-  /*** FILTRO INPUT ***/
-  $inputSearch.on("keyup", function () {
-    currentSearch = $(this).val().toLowerCase();
-    applyFilters();
+    $types.append($button);
   });
 
-  /*** APLICAR FILTROS ***/
-  function applyFilters() {
-    filteredPokemons = allPokemons.filter((pokemon) => {
-      const matchesType =
-        currentFilterType === "all" ||
-        pokemon.types.includes(currentFilterType);
-      const matchesSearch =
-        pokemon.name.toLowerCase().includes(currentSearch) ||
-        pokemon.id.toString().includes(currentSearch);
-      return matchesType && matchesSearch;
-    });
-
-    offset = 0;
-    $grid.find(".pokemon-card").remove();
-    renderPokemons();
+  async function initialize() {
+    $status.text("Cargando catálogo…");
+    try {
+      catalog = await data.catalog();
+      applyFilters();
+    } catch {
+      $status.empty().append("No se pudo conectar con PokéAPI. ", $("<button>").text("Reintentar").on("click", initialize));
+    }
   }
-
-  /*** RENDERIZAR TARJETAS ***/
-  function renderPokemons() {
-    const pokemonsToShow = filteredPokemons.slice(offset, offset + limit);
-
-    pokemonsToShow.forEach((pokemon) => {
-      const $card = $(`
-        <a href="./pokemon.html" class="pokemon-card" data-aos="fade-up" data-aos-delay="300" >
-          <p class="pokemon-id text-color-black type-${pokemon.classTypePrimary.toLowerCase()}${
-        pokemon.classTypeSecondary
-          ? "-" + pokemon.classTypeSecondary.toLowerCase()
-          : ""
-      }">Nº ${pokemon.id}</p>
-
-          <img class="pokemon-img" src="${pokemon.image}" alt="${
-        pokemon.name
-      }" />
-          <h3 class="pokemon-name text-color-black">${pokemon.name.toUpperCase()}</h3>
-          <!--<div class="pokemon-types"></div>-->
-        </a>
-      `);
-
-      const $typesContainerCard = $card.find(".pokemon-types");
-      pokemon.types.forEach((type) => {
-        const $span = $("<span>")
-          .addClass(`type-badge type-${type.toLowerCase()}`)
-          .text(type);
-        $typesContainerCard.append($span);
-      });
-
-      $card.on("click", function (e) {
-        e.preventDefault();
-        // Guardar objeto completo para pokemon.html igual que home.js
-        localStorage.setItem("pokemonSeleccionado", JSON.stringify(pokemon));
-        window.location.href = "./pokemon.html";
-      });
-
-      $grid.append($card);
-    });
-
-    offset += limit;
-    $btnVerMas.toggle(offset < filteredPokemons.length);
-    AOS.refresh();
-  }
-
-  $btnVerMas.on("click", renderPokemons);
-
-  // Lanzar carga
-  fetchAllPokemons();
+  initialize();
 });

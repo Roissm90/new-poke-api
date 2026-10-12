@@ -1,26 +1,28 @@
+import { reveal } from "../motion.js";
+import { createPokedexData } from "../pokedex-data.mjs";
+
 const API_BASE = "https://pokeapi.co/api/v2";
+const data = createPokedexData();
 
 export async function initPokemonEvolutionGame() {
   const $pictureBase = $("#activityThree .picture-pkmn-base");
   const $options = $("#activityThree .wrapper-options .wrapper-option img");
   const $dropZone = $("#activityThree .next-evolution");
   const $msgParagraph = $(".msg-activity");
+  let answered = false;
 
   const getRandomId = (max) => Math.floor(Math.random() * max) + 1;
 
   async function getRandomPokemon() {
     const randomId = getRandomId(1010);
-    const response = await fetch(`${API_BASE}/pokemon/${randomId}`);
-    return await response.json();
+    return data.request(`${API_BASE}/pokemon/${randomId}`);
   }
 
   async function getPokemonEvolution(pokemon) {
-    const speciesData = await fetch(pokemon.species.url);
-    const speciesJson = await speciesData.json();
-    const evolutionUrl = speciesJson.evolution_chain.url;
-
-    const evoData = await fetch(evolutionUrl);
-    const evoJson = await evoData.json();
+    const speciesJson = await data.request(pokemon.species.url);
+    const evolutionUrl = speciesJson.evolution_chain?.url;
+    if (!evolutionUrl) return null;
+    const evoJson = await data.request(evolutionUrl);
 
     const evoChain = evoJson.chain;
 
@@ -40,20 +42,14 @@ export async function initPokemonEvolutionGame() {
 
     if (!evolutionName) return null;
 
-    const evolutionResponse = await fetch(
-      `${API_BASE}/pokemon/${evolutionName}`
-    );
-    return await evolutionResponse.json();
+    return data.request(`${API_BASE}/pokemon/${evolutionName}`);
   }
 
   // NUEVO: Obtener la generación del Pokémon
   async function getPokemonGeneration(pokemon) {
-    const speciesData = await fetch(pokemon.species.url);
-    const speciesJson = await speciesData.json();
+    const speciesJson = await data.request(pokemon.species.url);
     const genUrl = speciesJson.generation.url;
-    const genData = await fetch(genUrl);
-    const genJson = await genData.json();
-    return genJson.name;
+    return data.request(genUrl);
   }
 
   // Fakes del mismo tipo y misma generación
@@ -63,54 +59,34 @@ export async function initPokemonEvolutionGame() {
     types,
     generation
   ) {
-    const fakes = [];
-    const usedIds = new Set([correctId, baseId]);
-
-    while (fakes.length < 2) {
-      const randomId = getRandomId(1010);
-      if (usedIds.has(randomId)) continue; // ya usado
-
-      const res = await fetch(`${API_BASE}/pokemon/${randomId}`);
-      const data = await res.json();
-      const dataTypes = data.types.map((t) => t.type.name);
-
-      // Verificamos tipo
-      if (!types.some((type) => dataTypes.includes(type))) continue;
-
-      // Verificamos generación
-      const fakeSpeciesData = await fetch(data.species.url);
-      const fakeSpeciesJson = await fakeSpeciesData.json();
-      const fakeGenUrl = fakeSpeciesJson.generation.url;
-      const fakeGenData = await fetch(fakeGenUrl);
-      const fakeGenJson = await fakeGenData.json();
-
-      if (fakeGenJson.name !== generation) continue;
-
-      // Evitamos repetir fakes
-      if (usedIds.has(data.id)) continue;
-
-      fakes.push(data);
-      usedIds.add(data.id);
-    }
-
-    return fakes;
+    const typeIds = await Promise.all(types.map(type => data.typeIds(type)));
+    const candidates = generation.pokemon_species.map(species => ({ id: Number(species.url.split("/").filter(Boolean).pop()) }))
+      .filter(species => species.id !== correctId && species.id !== baseId);
+    const matching = candidates.filter(species => typeIds.some(ids => ids.has(species.id))).sort(() => Math.random() - .5);
+    const remaining = candidates.filter(species => !matching.includes(species)).sort(() => Math.random() - .5);
+    const choices = [...matching, ...remaining].slice(0, 2);
+    return Promise.all(choices.map(species => data.request(`${API_BASE}/pokemon/${species.id}`)));
   }
 
-  async function startGame() {
+  async function startGame(attempt = 0) {
+    answered = true;
+    $msgParagraph.text("Cargando evolución…").show();
+    $options.parent().attr("aria-disabled", "true");
     try {
+      if (attempt >= 30) throw new Error("No evolution available");
       const pokemon = await getRandomPokemon();
       const evolution = await getPokemonEvolution(pokemon);
 
       if (!evolution) {
         console.log("Este Pokémon no tiene evolución. Reiniciando...");
-        return startGame();
+        return startGame(attempt + 1);
       }
 
       const pokemonTypes = pokemon.types.map((t) => t.type.name);
       const pokemonGen = await getPokemonGeneration(pokemon);
 
       // Pintar Pokémon base
-      $pictureBase.attr("src", pokemon.sprites.front_default);
+      $pictureBase.attr({ src: pokemon.sprites.front_default, alt: pokemon.name });
 
       // Obtener distractores
       const fakes = await getRandomFakesByTypeAndGen(
@@ -126,7 +102,13 @@ export async function initPokemonEvolutionGame() {
       // Pintar imágenes
       $options.each((index, el) => {
         $(el).attr("src", options[index].sprites.front_default);
+        $(el).attr("alt", options[index].name);
         $(el).attr("data-correct", options[index].id === evolution.id);
+        $(el).parent().attr({ role: "button", tabindex: "0", "aria-label": `Elegir ${options[index].name}`, "aria-disabled": "false" })
+          .off("click.evolution keydown.evolution").on("click.evolution", () => chooseEvolution($(el)))
+          .on("keydown.evolution", (event) => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); chooseEvolution($(el)); }
+          });
         $(el).draggable({
           revert: "invalid",
           helper: function () {
@@ -141,49 +123,59 @@ export async function initPokemonEvolutionGame() {
           cursor: "move",
         });
       });
+      answered = false;
+      $msgParagraph.text("Siguiente evolución");
 
       // Drop zone
       $dropZone.droppable({
         accept: "img",
         drop: function (event, ui) {
-          const isCorrect = ui.helper.attr("data-correct") === "true";
+          chooseEvolution(ui.helper);
+        },
+      });
+    } catch (error) {
+      $msgParagraph.text("No se pudo cargar la evolución. Recarga para reintentar.");
+      console.error("Error en el juego:", error);
+    }
+  }
+
+  function chooseEvolution($choice) {
+          if (answered) return;
+          answered = true;
+          $options.parent().attr("aria-disabled", "true");
+          const isCorrect = $choice.attr("data-correct") === "true";
 
           // Actualizamos la imagen dentro de .next-evolution
           const $targetImg = $dropZone.find(".next-evolution-picture");
-          $targetImg.attr("src", ui.helper.attr("src"));
+          $targetImg.attr({ src: $choice.attr("src"), alt: $choice.attr("alt") });
 
           if (isCorrect) {
             $pictureBase.addClass("revealed");
-            $msgParagraph.fadeOut();
+            $msgParagraph.hide();
             setTimeout(() => {
               $msgParagraph.text("Correcto");
-              $msgParagraph.fadeIn();
+              reveal($msgParagraph);
             }, 500);
           } else {
             $pictureBase.addClass("revealed");
-            $msgParagraph.fadeOut();
+            $msgParagraph.hide();
             setTimeout(() => {
               $msgParagraph.text("Incorrecto");
-              $msgParagraph.fadeIn();
+              reveal($msgParagraph);
             }, 500);
           }
           setTimeout(() => {
             $pictureBase.removeClass("revealed");
-            $msgParagraph.fadeOut();
-            $targetImg.fadeOut();
+            $msgParagraph.hide();
+            $targetImg.hide();
             setTimeout(() => {
               $targetImg.attr("src", "");
-              $targetImg.fadeIn();
-              $msgParagraph.text("Arrastra al recuadro la solución");
-              $msgParagraph.fadeIn();
+              reveal($targetImg);
+              $msgParagraph.text("Siguiente evolución");
+              reveal($msgParagraph);
             }, 500);
             startGame();
           }, 2000);
-        },
-      });
-    } catch (error) {
-      console.error("Error en el juego:", error);
-    }
   }
 
   startGame();

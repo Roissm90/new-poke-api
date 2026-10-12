@@ -1,15 +1,9 @@
 import { reproducirIntroMidi } from "./sounds.js";
+import { typeBadgeMarkup } from "./type-badges.mjs";
+import { reveal } from "./motion.js";
 
 $(window).on("load", async function () {
   //await reproducirIntroMidi();
-  // Inicializar AOS
-  AOS.init({
-    duration: 800,
-    easing: "ease-in-out-sine",
-    once: true,
-    mirror: false,
-  });
-
   // Recuperar datos del localStorage
   const pokemonData = localStorage.getItem("pokemonSeleccionado");
 
@@ -35,7 +29,7 @@ $(window).on("load", async function () {
   const $tooltip = $(".tooltip-cry");
 
   // Pintar nombre y ID
-  $title.text(pokemon.name.replace(/-/g, " ").toUpperCase());
+  $title.text(pokemon.name.replace(/-/g, " "));
   if( pokemon.classTypePrimary && pokemon.classTypeSecondary) {
     $id.addClass(`type-${pokemon.classTypePrimary}-${pokemon.classTypeSecondary}`);
   } else if (pokemon.classTypePrimary) {
@@ -52,12 +46,7 @@ $(window).on("load", async function () {
   // Pintar tipos
   $typesList.empty();
   $.each(pokemon.types, function (index, type) {
-    const $li = $("<li>");
-    $li.text(index === 0 ? "Tipo principal: " : "Tipo secundario: ");
-
-    const $span = $("<span>").text(type);
-    $li.append($span);
-    $li.addClass(`type-badge type-${type}`);
+    const $li = $("<li class='type-badge'>").append(typeBadgeMarkup(type));
 
     $typesList.append($li);
   });
@@ -76,7 +65,7 @@ $(window).on("load", async function () {
   $statValueList.empty();
   $.each(pokemon.stats, function (index, stat) {
     const $liName = $("<li>").text(traduceNameStats(stat.name));
-    const $liValue = $("<li>").text(stat.base);
+    const $liValue = $("<li>").text(stat.base).css("--stat-strength", `${Math.min(100, stat.base / 255 * 100)}%`);
 
     $statNameList.append($liName);
     $statValueList.append($liValue);
@@ -85,6 +74,7 @@ $(window).on("load", async function () {
   // Pintar imagen oficial
   $image.attr("src", pokemon.image);
   $image.attr("alt", pokemon.name);
+  reveal($(".sctn-pokemon-single .container-grid > .col-left, .sctn-pokemon-single .container-grid > .col-right"));
 
   // Reproducir cry al hacer clic en "Escuchar"
   if (pokemon.cries && pokemon.cries.latest) {

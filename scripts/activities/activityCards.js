@@ -1,14 +1,22 @@
+import { iconMarkup } from "../icons.js";
+import { createPokedexData } from "../pokedex-data.mjs";
+
 // Número de cartas totales (12) => 6 parejas
 const TOTAL_CARDS = 12;
 const API_URL = "https://pokeapi.co/api/v2/pokemon/";
+const loader = createPokedexData();
 
 let firstCard = null;
 let secondCard = null;
 let lockBoard = false;
+let gameRevision = 0;
+let mismatchTimer;
 
 export async function initCardsGame() {
+    const revision = ++gameRevision;
+    clearTimeout(mismatchTimer);
     const $gameboard = $(".wrapper-activity-two .gameboard");
-    $gameboard.empty();
+    $gameboard.empty().append('<p class="catalog-summary" role="status">Cargando parejas…</p>');
 
     firstCard = null;
     secondCard = null;
@@ -17,6 +25,8 @@ export async function initCardsGame() {
     // 1. Obtener 6 Pokémon aleatorios
     const randomIds = getRandomPokemonIds(TOTAL_CARDS / 2);
     const pokemonData = await Promise.all(randomIds.map(id => fetchPokemon(id)));
+    if (revision !== gameRevision) return;
+    $gameboard.empty();
 
     // 2. Duplicamos para formar parejas
     let cardsData = [...pokemonData, ...pokemonData];
@@ -41,8 +51,7 @@ function getRandomPokemonIds(count) {
 }
 
 async function fetchPokemon(id) {
-    const res = await fetch(API_URL + id);
-    const data = await res.json();
+    const data = await loader.request(API_URL + id);
 
     const types = data.types.map(t => t.type.name);
     const typeClass = types.length === 1 
@@ -72,9 +81,9 @@ function shuffle(array) {
 
 function createCard(pokemon, index) {
     const $card = $(`
-        <div class="card" data-pokemon-id="${pokemon.id}" data-index="${index}">
+        <div class="card" role="button" tabindex="0" aria-label="Carta ${index + 1}" aria-pressed="false" data-pokemon-id="${pokemon.id}" data-index="${index}">
             <div class="card-inner">
-                <div class="card-front bg-color-dark-third text-color-light-third"></div>
+                <div class="card-front bg-color-dark-third text-color-light-third">${iconMarkup("brand")}</div>
                 <div class="card-back ${pokemon.typeClass}">
                     <img src="${pokemon.image}" alt="${pokemon.name}">
                 </div>
@@ -83,6 +92,9 @@ function createCard(pokemon, index) {
     `);
 
     $card.on("click", () => flipCard($card, pokemon));
+    $card.on("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); flipCard($card, pokemon); }
+    });
     return $card;
 }
 
@@ -90,7 +102,7 @@ function flipCard($card, pokemon) {
     if (lockBoard) return;
     if ($card.hasClass("flipped")) return;
 
-    $card.addClass("flipped");
+    $card.addClass("flipped").attr("aria-pressed", "true");
 
     if (!firstCard) {
         firstCard = { $el: $card, pokemon };
@@ -109,7 +121,7 @@ function checkMatch() {
         // Mantener abiertas y sonar grito
         if (firstCard.pokemon.cry) {
             const audio = new Audio(firstCard.pokemon.cry);
-            audio.play();
+            audio.play().catch(() => {});
         }
 
         firstCard = null;
@@ -117,9 +129,9 @@ function checkMatch() {
         checkWin();
     } else {
         lockBoard = true;
-        setTimeout(() => {
-            firstCard.$el.removeClass("flipped");
-            secondCard.$el.removeClass("flipped");
+        mismatchTimer = setTimeout(() => {
+            firstCard.$el.removeClass("flipped").attr("aria-pressed", "false");
+            secondCard.$el.removeClass("flipped").attr("aria-pressed", "false");
             firstCard = null;
             secondCard = null;
             lockBoard = false;
@@ -138,5 +150,5 @@ function checkWin() {
 }
 
 export function restartCardsGame() {
-    initCardsGame();
+    return initCardsGame();
 }

@@ -10,7 +10,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" type="text/css" href="../styles/styles.css" />
-    <link rel="icon" href="../favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="../styles/atlas.css" />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
     <!-- AOS CSS -->
     <link
       rel="stylesheet"
@@ -66,9 +67,9 @@
       </nav>
     </header>
 
-    <section class="first-margin sctn-battle-game">
+    <section class="first-margin sctn-battle-game" data-aos="fade-up">
       <div class="container-grid">
-        <div class="cpu-row row" data-aos="fade-right" data-aos-duration="600">
+        <div class="cpu-row row">
             <div class="info-cpu">
                 <p class="level-cpu"></p>
                 <div class="ps-cpu">
@@ -93,7 +94,7 @@
             
             <p class="info-attack-cpu bg-color-dark-third text-color-light"></p>
         </div>
-        <div class="player-row row" data-aos="fade-left" data-aos-duration="600">
+        <div class="player-row row">
             <div class="wrapper-sprite-player">
                 <img src="" class="sprite-player bg-color-light" alt=""/>
             </div>
@@ -116,36 +117,38 @@
                 </div>
             </div>
         </div>
-        <div class="moves-player-row row" data-aos="fade-up" data-aos-duration="600" data-aos-delay="600">
-            <div class="move move-1 btn btn-dark">
-                <p class="name"></p>
-                <p class="pp">
+        <p id="battleStatus" class="battle-status" role="status" aria-live="polite">Preparando combate…</p>
+        <div class="moves-player-row row">
+          <button type="button" class="move move-1 btn btn-dark" disabled>
+            <span class="name"></span>
+            <span class="pp">
                     <span class="actual"></span>/<span class="total"></span>
-                </p>
-            </div>
-            <div class="move move-2 btn btn-dark">
-                <p class="name"></p>
-                <p class="pp">
+            </span>
+          </button>
+          <button type="button" class="move move-2 btn btn-dark" disabled>
+            <span class="name"></span>
+            <span class="pp">
                     <span class="actual"></span>/<span class="total"></span>
-                </p>
-            </div>
-            <div class="move move-3 btn btn-dark">
-                <p class="name"></p>
-                <p class="pp">
+            </span>
+          </button>
+          <button type="button" class="move move-3 btn btn-dark" disabled>
+            <span class="name"></span>
+            <span class="pp">
                     <span class="actual"></span>/<span class="total"></span>
-                </p>
-            </div>
-            <div class="move move-4 btn btn-dark">
-                <p class="name"></p>
-                <p class="pp">
+            </span>
+          </button>
+          <button type="button" class="move move-4 btn btn-dark" disabled>
+            <span class="name"></span>
+            <span class="pp">
                     <span class="actual"></span>/<span class="total"></span>
-                </p>
-            </div>
+            </span>
+          </button>
         </div>
+        <a class="battle-exit btn btn-light" href="./game.html">Salir del combate</a>
       </div>
     </section>
 
-    <div class="modal-battle">
+    <div class="modal-battle modal">
       <div class="overlay">
         <button class="close-modal"></button>
         <h4 class="title text-color-dark-third"></h4>

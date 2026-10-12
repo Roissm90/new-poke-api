@@ -3,37 +3,19 @@ import { initGame, resetGame } from "./activities/activityGuess.js";
 import { initCardsGame, restartCardsGame } from "./activities/activityCards.js";
 import { initPokemonEvolutionGame } from "./activities/activityEvolutions.js";
 import { initRace } from "./activities/activityRace.js";
-
-const typeTranslations = {
-  normal: "Normal",
-  fire: "Fuego",
-  water: "Agua",
-  grass: "Planta",
-  electric: "Eléctrico",
-  ice: "Hielo",
-  fighting: "Lucha",
-  poison: "Veneno",
-  ground: "Tierra",
-  flying: "Volador",
-  psychic: "Psíquico",
-  bug: "Bicho",
-  rock: "Roca",
-  ghost: "Fantasma",
-  dragon: "Dragón",
-  dark: "Siniestro",
-  steel: "Acero",
-  fairy: "Hada",
-};
+import { reveal } from "./motion.js";
+import { icon } from "./icons.js";
+import { typeBadgeMarkup } from "./type-badges.mjs";
 
 $(window).on("load", async function () {
+  let guessRevision = 0;
+  function guessLoadError(revision) {
+    if (revision !== guessRevision) return;
+    $(".msg-guess").text("No se pudo cargar el Pokémon. Vuelve a seleccionar la generación.");
+    $(".input-guess").prop("disabled", true);
+    $("#nextPokemonBtn").hide();
+  }
   //await reproducirBattleMidi();
-  AOS.init({
-    duration: 800,
-    easing: "ease-in-out-sine",
-    once: true,
-    mirror: false,
-  });
-
   //ACTIVITY ONE
   $.getJSON("https://pokeapi.co/api/v2/generation?limit=1000", function (data) {
     const generations = data.results;
@@ -58,14 +40,21 @@ $(window).on("load", async function () {
     });
 
     // Evento click para seleccionar generación y obtener Pokémon aleatorio
+    listGenerations.attr({ role: "button", tabindex: "0", "aria-pressed": "false" }).on("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") { event.preventDefault(); $(this).trigger("click"); }
+    });
     listGenerations.click(function () {
-      listGenerations.removeClass("active");
-      $(this).toggleClass("active");
+      const revision = ++guessRevision;
+      listGenerations.removeClass("active").attr("aria-pressed", "false");
+      $(this).toggleClass("active").attr("aria-pressed", "true");
       resetGame();
+      $(".input-guess").prop("disabled", true);
+      $(".msg-guess").text("Cargando Pokémon…");
       const genUrl = $(this).data("url");
 
       if (genUrl) {
         $.getJSON(genUrl, function (genData) {
+          if (revision !== guessRevision) return;
           const species = genData.pokemon_species;
           if (species && species.length > 0) {
             // Elegir Pokémon aleatorio primero
@@ -76,6 +65,7 @@ $(window).on("load", async function () {
             $.getJSON(
               `https://pokeapi.co/api/v2/pokemon/${randomSpecies.name}/`,
               function (pokemonData) {
+                if (revision !== guessRevision) return;
                 // Obtenemos datos básicos
                 const pokemonId = pokemonData.id;
                 const sprite =
@@ -98,6 +88,7 @@ $(window).on("load", async function () {
                 $.getJSON(
                   `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`,
                   function (speciesData) {
+                    if (revision !== guessRevision) return;
                     const entryEs = speciesData.flavor_text_entries.find(
                       (entry) => entry.language.name === "es"
                     );
@@ -119,9 +110,7 @@ $(window).on("load", async function () {
                     imgPkmnGuess.attr("src", sprite);
                     let hintOne = wrapperActGuess.find(".hint-one .hint-info");
                     hintOne.empty();
-                    hintOne.append(
-                      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3z"/><path d="M13.5 12c0-1.1-.9-2-2-2v4c1.1 0 2-.9 2-2z"/><path d="M15.5 12c0-2.2-1.8-4-4-4v8c2.2 0 4-1.8 4-4z"/></svg>'
-                    );
+                    hintOne.append(icon("sound"));
                     let hintTwo = wrapperActGuess.find(".hint-two .hint-info");
                     hintTwo.text(pkmnToGuess.id);
                     let hintThree = wrapperActGuess.find(
@@ -132,27 +121,18 @@ $(window).on("load", async function () {
                         " "
                       );
                     });
-                    const types = pkmnToGuess.types;
-                    const translatedTypes = pkmnToGuess.types.map(
-                      (type) => typeTranslations[type] || type
-                    );
-                    hintThree.text(translatedTypes.join(" - "));
-                    if (pkmnToGuess.types.length === 1) {
-                      hintThree.addClass(`type-${pkmnToGuess.types[0]}`);
-                    } else if (pkmnToGuess.types.length === 2) {
-                      hintThree.addClass(
-                        `type-${pkmnToGuess.types[0]}-${pkmnToGuess.types[1]}`
-                      );
-                    }
+                    hintThree.html(pkmnToGuess.types.map(typeBadgeMarkup).join(""));
                     let hintFour = wrapperActGuess.find(
                       ".hint-four .hint-info"
                     );
                     hintFour.text(pkmnToGuess.description);
+                    initGame(pkmnToGuess, species, onNextPokemon);
                   }
-                );
+                ).fail(() => guessLoadError(revision));
 
                 // Definimos la función onNextPokemon ANTES de usarla
                 function onNextPokemon() {
+                  if (revision !== guessRevision) return;
                   const randomIndex = Math.floor(
                     Math.random() * species.length
                   );
@@ -161,6 +141,7 @@ $(window).on("load", async function () {
                   $.getJSON(
                     `https://pokeapi.co/api/v2/pokemon/${randomSpecies.name}/`,
                     function (pokemonData) {
+                      if (revision !== guessRevision) return;
                       const pokemonId = pokemonData.id;
                       const sprite =
                         pokemonData.sprites.other["official-artwork"]
@@ -181,6 +162,7 @@ $(window).on("load", async function () {
                       $.getJSON(
                         `https://pokeapi.co/api/v2/pokemon-species/${pokemonId}`,
                         function (speciesData) {
+                          if (revision !== guessRevision) return;
                           const entryEs = speciesData.flavor_text_entries.find(
                             (entry) => entry.language.name === "es"
                           );
@@ -210,17 +192,7 @@ $(window).on("load", async function () {
                               className.match(/(^|\s)type-\S+/g) || []
                             ).join(" ");
                           });
-                          const translatedTypes = newPkmn.types.map(
-                            (type) => typeTranslations[type] || type
-                          );
-                          hintThree.text(translatedTypes.join(" - "));
-                          if (newPkmn.types.length === 1) {
-                            hintThree.addClass(`type-${newPkmn.types[0]}`);
-                          } else if (newPkmn.types.length === 2) {
-                            hintThree.addClass(
-                              `type-${newPkmn.types[0]}-${newPkmn.types[1]}`
-                            );
-                          }
+                          hintThree.html(newPkmn.types.map(typeBadgeMarkup).join(""));
 
                           let hintFour = wrapperActGuess.find(
                             ".hint-four .hint-info"
@@ -230,46 +202,69 @@ $(window).on("load", async function () {
                           // Reiniciamos el juego con el nuevo Pokémon
                           initGame(newPkmn, species, onNextPokemon);
                         }
-                      );
+                      ).fail(() => guessLoadError(revision));
                     }
-                  );
+                  ).fail(() => guessLoadError(revision));
                 }
 
-                // Inicializamos el juego y pasamos onNextPokemon como callback
-                const hintsModule = initGame(
-                  pkmnToGuess,
-                  species,
-                  onNextPokemon
-                );
               }
-            );
+            ).fail(() => guessLoadError(revision));
           } else {
             console.log("No hay Pokémon en esta generación.");
           }
         }).fail(function () {
+          if (revision === guessRevision) $(".msg-guess").text("No se pudo cargar la generación. Vuelve a seleccionarla.");
           console.error("Error al obtener los datos de la generación.");
         });
       }
     });
     //simular el click para que el primero sea la primera generacion
     listGenerations.first().trigger("click");
+  }).fail(() => {
+    $(".msg-guess").text("No se pudieron cargar las generaciones. Recarga para reintentar.");
+    $(".input-guess").prop("disabled", true);
   });
 
   $(".wrapper-activity").hide();
-  $(".wrapper-activity-one").slideDown();
+  reveal($(".wrapper-activity-one"));
 
   const gridGame = $(".container-grid-gameboard");
   let activity = $(".list-activities .activity-item");
+  activity.first().addClass("active");
+  const initialized = new Set(["#activityOne"]);
+
+  function loadCards(restart = false) {
+    (restart ? restartCardsGame() : initCardsGame()).catch(() => {
+      const $board = $("#activityTwo .gameboard").empty();
+      $board.append($('<p role="status">').text("No se pudieron cargar las parejas."));
+      $board.append($('<button type="button" class="btn btn-light">').text("Reintentar").on("click", () => loadCards(restart)));
+    });
+  }
+
+  function initializeActivity(target) {
+    if (initialized.has(target)) return;
+    initialized.add(target);
+    if (target === "#activityTwo") loadCards();
+    if (target === "#activityThree") initPokemonEvolutionGame();
+    if (target === "#activityFour") initRace($("#activityFour .gameboard"), $("#startBtn"), $("#status"));
+  }
+
+  activity.attr({ role: "button", tabindex: "0" }).each(function () {
+    $(this).attr("aria-pressed", $(this).hasClass("active"));
+  }).on("keydown", function (event) {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); $(this).trigger("click"); }
+  });
 
   activity.click(function () {
     let thisItem = $(this);
 
-    activity.removeClass("active");
-    thisItem.toggleClass("active");
+    activity.removeClass("active").attr("aria-pressed", "false");
+    thisItem.toggleClass("active").attr("aria-pressed", "true");
 
     let target = thisItem.data("target");
     gridGame.find(".wrapper-activity").hide();
-    gridGame.find(target).fadeIn(500);
+    reveal(gridGame.find(target));
+    initializeActivity(target);
   });
 
   $("#nextPokemonBtn").click(function () {
@@ -277,26 +272,19 @@ $(window).on("load", async function () {
   });
 
   //ACTIVITY TWO
-  initCardsGame();
   $("#restartBtnActivityTwo").on("click", function () {
     const $board = $(".wrapper-activity-two .gameboard");
     $("#restartBtnActivityTwo").removeClass("show");
 
-    $board.fadeOut(300, function () {
-      restartCardsGame();
-      $board.fadeIn(1000);
+    $board.fadeOut(parseFloat(getComputedStyle($board[0]).getPropertyValue("--enter-duration")) || 900, function () {
+      loadCards(true);
+      reveal($board);
     });
   });
 
   //ACTIVITY THREE
-  initPokemonEvolutionGame();
 
   //ACTIVITY FOUR
-  initRace(
-    $(".wrapper-activity-four .gameboard"),
-    $(".wrapper-activity-four #startBtn"),
-    $(".wrapper-activity-four #status")
-  );
   const resetBtn = $(".wrapper-activity-four #resetBtn");
   resetBtn.off("click").on("click", async () => {
     initRace(

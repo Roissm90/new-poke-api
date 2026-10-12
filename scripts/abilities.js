@@ -1,12 +1,7 @@
-$(document).ready(async function () {
-  // Inicializar AOS
-  AOS.init({
-    duration: 800,
-    easing: "ease-in-out-sine",
-    once: true,
-    mirror: false,
-  });
+import { compareAbilities } from "./catalog-order.mjs";
+import { reveal } from "./motion.js";
 
+$(document).ready(async function () {
   //Limpia saltos de línea y espacios sobrantes
   const cleanText = (text) => text ? text.replace(/[\n\f]/g, " ").replace(/\s+/g, " ").trim() : "";
 
@@ -17,6 +12,8 @@ $(document).ready(async function () {
   const removeDuplicates = (array) => [...new Set(array)];
 
   const abilitiesUrl = "https://pokeapi.co/api/v2/ability?limit=1000";
+  const $summary = $('<p class="catalog-summary" role="status">Cargando habilidades…</p>').insertBefore(".list-abilities");
+  const $empty = $('<p class="catalog-empty" hidden>No hay habilidades con ese nombre.</p>').insertAfter(".list-abilities");
 
   try {
     const response = await fetch(abilitiesUrl);
@@ -57,14 +54,20 @@ $(document).ready(async function () {
       })
     );
 
-    const filteredAbilities = abilityDetails.filter((ability) => ability !== null);
+    const filteredAbilities = abilityDetails.filter((ability) => ability !== null).sort(compareAbilities);
 
     //Pintar lista de habilidades
     const $listContainer = $(".list-abilities");
     $listContainer.empty();
 
     filteredAbilities.forEach((ability) => {
-      const $li = $(`<li data-aos="fade-up" data-aos-delay="300" class="ability-item text-color-dark" data-id="${ability.id}">${ability.nombre}</li>`);
+      const $li = $('<li class="ability-item" role="button" tabindex="0">')
+        .attr("data-id", ability.id)
+        .append($("<span class='catalog-item-name'>").text(ability.nombre))
+        .append($("<span class='catalog-item-meta'>").text(`#${String(ability.id).padStart(3, "0")}`));
+      $li.on("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); $li.trigger("click"); }
+      });
       $listContainer.append($li);
 
       // Evento para abrir modal con la info de la habilidad
@@ -89,14 +92,19 @@ $(document).ready(async function () {
     });
 
     //FILTRO DE BÚSQUEDA DINÁMICO
-    $("#search-ability").on("keyup", function () {
-      const filter = $(this).val().toLowerCase();
+    reveal($listContainer);
+    $summary.text(`${filteredAbilities.length} habilidades`);
+    $("#search-ability").on("input", function () {
+      const filter = $(this).val().trim().toLowerCase();
 
       $(".ability-item").each(function () {
-        const text = $(this).text().toLowerCase();
+        const text = $(this).find(".catalog-item-name").text().toLowerCase();
         $(this).toggle(text.includes(filter));
       });
-    });
+      const visible = $(".ability-item").filter(function () { return this.style.display !== "none"; }).length;
+      $summary.text(`${visible} habilidades`);
+      $empty.prop("hidden", visible > 0);
+    }).trigger("input");
 
     // ❌ Cerrar modal clic fuera
     const $modal = $(".modal-ability");
@@ -117,6 +125,7 @@ $(document).ready(async function () {
     });
 
   } catch (error) {
+    $summary.text("No se pudieron cargar las habilidades. Recarga para reintentar.");
     console.error("❌ Error al obtener las habilidades:", error);
   }
 });

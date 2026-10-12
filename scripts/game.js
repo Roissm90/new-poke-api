@@ -1,227 +1,182 @@
-window.onload = function () {
-  const $sectionGame = $(".sctn-game");
-  let currentPokemon = null; // ← Guardará el objeto completo del Pokémon del modal
-  let pokemons = []; // ← Lista global de todos los Pokémon
+import { createBattleData } from "./game-data.mjs";
+import { filterCatalog, PAGE_SIZE } from "./pokedex-data.mjs";
+import { icon } from "./icons.js";
+import { typeBadgeMarkup } from "./type-badges.mjs";
+import { reveal } from "./motion.js";
 
-  /*** SPINNER DE CARGA ***/
-  const $spinner = $(`
-    <div class="spinner bg-color-light">
-        <div class="wrapper-bounces bg-color-dark"></div>
-        <p class="bg-color-dark">Cargando Pokédex...</p>
-    </div>
-  `);
-  $sectionGame.prepend($spinner);
+$(function () {
+  const data = createBattleData();
+  const $list = $(".list-pokemon");
+  const $status = $("#battleCatalogStatus");
+  const $pagination = $(".pokedex-pagination");
+  const $modal = $(".modal-pokemon");
+  const $battleButton = $("#battleBtn");
+  const $battleStatus = $("#battleSelectionStatus");
+  const statsES = {
+    hp: "PS", attack: "Ataque", defense: "Defensa",
+    "special-attack": "Ataque Especial", "special-defense": "Defensa Especial", speed: "Velocidad",
+  };
+  let catalog = [];
+  let filtered = [];
+  let page = 1;
+  let revision = 0;
+  let searchTimer;
+  let currentEntry = null;
+  let currentPokemon = null;
+  let selecting = false;
+  let selectionRevision = 0;
 
-  /*** FUNCIONES AUXILIARES ***/
-  async function getTypeNameES(url) {
-    const typeData = await $.ajax({ url, method: "GET" });
-    return typeData.names.find((n) => n.language.name === "es")?.name || typeData.name;
-  }
-
-  async function getAbilityNameES(url) {
-    const abilityData = await $.ajax({ url, method: "GET" });
-    return abilityData.names.find((n) => n.language.name === "es")?.name || abilityData.name;
-  }
-
-  async function getMoveNameES(url) {
-    const moveData = await $.ajax({ url, method: "GET" });
-    return {
-      nameES: moveData.names.find((n) => n.language.name === "es")?.name || moveData.name,
-      nameEN: moveData.name,
-      type: moveData.type.name,
-      power: moveData.power,
-      pp: moveData.pp,
-      accuracy: moveData.accuracy,
-      damage_class: moveData.damage_class.name,
-    };
-  }
-
-  async function getPokemonData(poke) {
-    try {
-      const data = await $.ajax({ url: poke.url, method: "GET" });
-      const speciesData = await $.ajax({ url: `https://pokeapi.co/api/v2/pokemon-species/${data.id}/`, method: "GET" });
-
-      const nombreEsp = speciesData.names.find((n) => n.language.name === "es")?.name || data.name;
-      const description = speciesData.flavor_text_entries.find((f) => f.language.name === "es")?.flavor_text || "";
-
-      const abilities = await Promise.all(
-        data.abilities.map(async (a) => ({ nameES: await getAbilityNameES(a.ability.url), nameEN: a.ability.name }))
-      );
-
-      const types = await Promise.all(
-        data.types.map(async (t) => ({ nameES: await getTypeNameES(t.type.url), nameEN: t.type.name }))
-      );
-
-      const moves = await Promise.all(
-        data.moves
-          .filter((m) => m.version_group_details.some((v) => v.move_learn_method.name === "level-up"))
-          .map(async (m) => {
-            const moveInfo = await getMoveNameES(m.move.url);
-            const levelDetail = m.version_group_details.find((v) => v.move_learn_method.name === "level-up");
-            return { ...moveInfo, level_learned_at: levelDetail?.level_learned_at || null };
-          })
-      );
-
-      const totalStats = data.stats.reduce((acc, s) => acc + s.base_stat, 0);
-
-      return {
-        id: data.id,
-        name: nombreEsp,
-        description,
-        image: data.sprites.other["official-artwork"].front_default,
-        abilities,
-        types,
-        stats: data.stats.map((s) => ({ name: s.stat.name, base: s.base_stat })),
-        totalStats,
-        moves,
-      };
-    } catch (err) {
-      console.error("Error cargando Pokémon:", poke.name, err);
-      return null;
+  function pagination() {
+    const total = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const start = Math.max(1, Math.min(page - 1, total - 2));
+    const end = Math.min(total, start + 2);
+    $pagination.empty();
+    function button(label, target, disabled, accessibleLabel, iconName = null) {
+      const $button = $("<button type='button'>").text(label).attr({ "aria-label": accessibleLabel, title: accessibleLabel })
+        .prop("disabled", disabled).toggleClass("current", target === page && !disabled);
+      if (iconName) $button.empty().append(icon(iconName));
+      if (target === page && !disabled) $button.attr("aria-current", "page");
+      $button.on("click", () => {
+        page = target;
+        render();
+        document.querySelector(".sctn-game").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      $pagination.append($button);
     }
+    button("", page - 1, page === 1, "Página anterior", "previous");
+    if (start > 1) button("1", 1, false, "Página 1");
+    if (start > 2) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    for (let number = start; number <= end; number += 1) button(String(number), number, false, `Página ${number}`);
+    if (end < total - 1) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    if (end < total) button(String(total), total, false, `Página ${total}`);
+    button("", page + 1, page === total, "Página siguiente", "next");
+    $("#battlePageSummary").text(`Página ${page} de ${total}`);
   }
 
-  /*** OBTENER TODOS LOS POKÉMON ***/
-  async function getAllPokemon() {
-    try {
-      const listData = await $.ajax({ url: "https://pokeapi.co/api/v2/pokemon?limit=1010", method: "GET" });
-      const pokemonList = listData.results;
-      const batchSize = 10;
+  function closeModal() {
+    selectionRevision += 1;
+    selecting = false;
+    currentEntry = null;
+    currentPokemon = null;
+    $modal.removeClass("show");
+    $battleStatus.empty();
+    $battleButton.text("Entrenar").attr("aria-disabled", "false");
+  }
 
-      for (let i = 0; i < pokemonList.length; i += batchSize) {
-        const batch = pokemonList.slice(i, i + batchSize);
-        const batchResults = await Promise.all(batch.map(getPokemonData));
-        pokemons.push(...batchResults.filter(Boolean));
+  function openModal(entry, pokemon) {
+    currentEntry = entry;
+    currentPokemon = pokemon;
+    $modal.find(".title").text(pokemon.name.replaceAll("-", " "));
+    $modal.find(".image").attr({ src: pokemon.image, alt: pokemon.name });
+    const $types = $modal.find(".type").empty();
+    pokemon.types.forEach((name) => {
+      $types.append($("<li class='type-item'>").append(typeBadgeMarkup(name)));
+    });
+    pokemon.stats.forEach((stat) => $modal.find(`.stat-item.${stat.name}`).text(`${statsES[stat.name]}: ${stat.base}`));
+    $modal.addClass("show");
+  }
+
+  async function render() {
+    const token = ++revision;
+    const entries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    $list.empty().attr("aria-busy", "true");
+    pagination();
+    $status.text(entries.length ? "Cargando Pokémon…" : "No hay Pokémon con esa búsqueda.");
+    if (!entries.length) {
+      $list.attr("aria-busy", "false");
+      return;
+    }
+    entries.forEach(() => $list.append('<div class="pokemon-skeleton" aria-hidden="true"></div>'));
+    const results = await Promise.allSettled(entries.map((entry) => data.pokemon(entry, true)));
+    if (token !== revision) return;
+    $list.empty().attr("aria-busy", "false");
+    let failures = 0;
+    results.forEach((result, index) => {
+      if (result.status !== "fulfilled") {
+        failures += 1;
+        $list.append($("<button type='button' class='pokemon-retry'>").text(`Reintentar ${entries[index].name}`).on("click", render));
+        return;
       }
-
-      $spinner.hide();
-      console.log("TODOS LOS POKÉMON:", pokemons);
-
-      /*** PINTAR EN LA LISTA ***/
-      const $listContainer = $(".list-pokemon");
-      $listContainer.empty();
-
-      const statsES = {
-        hp: "PS",
-        attack: "Ataque",
-        defense: "Defensa",
-        "special-attack": "Ataque Especial",
-        "special-defense": "Defensa Especial",
-        speed: "Velocidad",
-      };
-
-      pokemons.forEach((p) => {
-        const pokemonDiv = $(`
-          <div class="pokemon-item btn btn-light" data-name="${p.name}" data-id="${p.id}">
-            <img src="${p.image}" alt="${p.name}" />
-            <span class="pokemon-name">${p.name}</span>
-          </div>
-        `);
-        $listContainer.append(pokemonDiv);
-
-        /*** CLICK EN POKÉMON PARA ABRIR MODAL ***/
-        pokemonDiv.on("click", function () {
-          const $modal = $(".modal-pokemon");
-          $modal.addClass("show");
-          currentPokemon = p; // Guardar Pokémon actual
-
-          $modal.find(".title").text(p.name);
-          $modal.find(".image").attr("src", p.image);
-
-          const $typeList = $modal.find(".type");
-          $typeList.empty();
-          p.types.forEach((t) => $typeList.append(`<li class="text-color-dark type-item type-${t.nameEN}">${t.nameES}</li>`));
-
-          p.stats.forEach((s) => $modal.find(`.stat-item.${s.name}`).text(`${statsES[s.name]}: ${s.base}`));
-        });
-      });
-
-      /*** FILTRO POR INPUT EN TIEMPO REAL ***/
-      $("#searchInputPokedex").on("keyup", function () {
-        const query = $(this).val().toLowerCase();
-        const $items = $listContainer.children();
-        if (!query) { $items.show(); return; }
-
-        let anyVisible = false;
-        $items.each(function () {
-          const $item = $(this);
-          const name = $item.data("name").toLowerCase();
-          const id = $item.data("id").toString();
-
-          if (name.includes(query) || id.includes(query)) {
-            $item.show();
-            anyVisible = true;
-          } else {
-            $item.hide();
-          }
-        });
-
-        if (!anyVisible) $items.show();
-      });
-
-      //Cerrar modal clic fuera
-      const $modal = $(".modal-pokemon");
-      $modal.on("click", function (e) {
-        if (e.target === this) {
-          $modal.removeClass("show");
-          currentPokemon = null;
-          localStorage.removeItem("pokemonToFightCPU");
-        }
-      });
-
-      //Botón cerrar modal
-      $(".close-modal").on("click", function () {
-        $modal.removeClass("show");
-        currentPokemon = null;
-        localStorage.removeItem("pokemonToFightCPU");
-      });
-
-      //Cerrar modal con Escape
-      $(document).on("keydown", function (e) {
-        if (e.key === "Escape") {
-          $modal.removeClass("show");
-          currentPokemon = null;
-          localStorage.removeItem("pokemonToFightCPU");
-        }
-      });
-
-      /*** GUARDAR POKÉMON EN LOCALSTORAGE AL HACER CLICK EN #battleBtn ***/
-      $("#battleBtn").on("click", function () {
-        if (!currentPokemon) {
-          console.log('No hay Pokémon seleccionado');
-          return;
-        }
-
-        // Pokémon jugador
-        localStorage.setItem("pokemonToFight", JSON.stringify(currentPokemon));
-        console.log("Pokémon del jugador guardado en localStorage:", currentPokemon);
-
-        // Pokémon CPU aleatorio ±5 totalStats
-        const minStats = currentPokemon.totalStats - 5;
-        const maxStats = currentPokemon.totalStats + 5;
-
-        let eligibleCPU = pokemons.filter(
-          (p) => p.id !== currentPokemon.id && p.totalStats >= minStats && p.totalStats <= maxStats
-        );
-
-        let cpuPokemon;
-        if (eligibleCPU.length === 0) {
-          // Si no hay elegibles, cualquiera excepto el jugador
-          eligibleCPU = pokemons.filter((p) => p.id !== currentPokemon.id);
-          cpuPokemon = eligibleCPU[Math.floor(Math.random() * eligibleCPU.length)];
-        } else {
-          cpuPokemon = eligibleCPU[Math.floor(Math.random() * eligibleCPU.length)];
-        }
-
-        localStorage.setItem("pokemonToFightCPU", JSON.stringify(cpuPokemon));
-        console.log("Pokémon CPU guardado en localStorage:", cpuPokemon);
-      });
-
-    } catch (err) {
-      $spinner.find("p").text("Error al cargar la Pokédex");
-      console.error("Error cargando lista de Pokémon", err);
-    }
+      const pokemon = result.value;
+      const $item = $("<button type='button' class='pokemon-item btn btn-light'>")
+        .attr({ "data-id": pokemon.id, "aria-label": `Seleccionar ${pokemon.name}, número ${pokemon.id}` });
+      $item.append($("<img>").attr({ src: pokemon.image, alt: pokemon.name, width: 40, height: 40, decoding: "async" }));
+      $item.append($("<span class='pokemon-name'>").text(pokemon.name.replaceAll("-", " ")));
+      $item.on("click", () => openModal(entries[index], pokemon));
+      $list.append($item);
+    });
+    const first = (page - 1) * PAGE_SIZE + 1;
+    reveal($list);
+    reveal($pagination);
+    $status.text(failures ? `${failures} Pokémon no se han podido cargar. Puedes reintentarlos.` : `Mostrando ${first}–${first + entries.length - 1} de ${filtered.length}`);
+    filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).forEach((entry) => {
+      data.pokemon(entry).then((pokemon) => {
+        const image = new Image();
+        image.src = pokemon.image;
+      }).catch(() => {});
+    });
   }
 
-  getAllPokemon();
-};
+  $("#searchInputPokedex").on("input", function () {
+    clearTimeout(searchTimer);
+    revision += 1;
+    searchTimer = setTimeout(() => {
+      filtered = filterCatalog(catalog, this.value);
+      page = 1;
+      render();
+    }, 180);
+  });
+  $modal.on("click", function (event) {
+    if (event.target === this) closeModal();
+  });
+  $modal.find(".close-modal").on("click", closeModal);
+  $(document).on("keydown", (event) => {
+    if (event.key === "Escape" && $modal.hasClass("show")) closeModal();
+  });
+  $battleButton.on("click", async (event) => {
+    event.preventDefault();
+    if (!currentEntry || selecting) return;
+    selecting = true;
+    const entry = currentEntry;
+    const token = ++selectionRevision;
+    const isCancelled = () => token !== selectionRevision;
+    const playerStats = {
+      id: currentPokemon.id,
+      totalStats: currentPokemon.stats.reduce((total, stat) => total + stat.base, 0),
+    };
+    $battleButton.text("Preparando…").attr("aria-disabled", "true");
+    $battleStatus.text("Buscando un rival de nivel similar…");
+    try {
+      const cpuEntry = await data.opponent(catalog, playerStats, (checked, total) => {
+        $battleStatus.text(`Buscando rival: ${checked} de ${total} Pokémon comprobados…`);
+      }, isCancelled);
+      if (isCancelled()) return;
+      $battleStatus.text("Cargando movimientos de ambos Pokémon…");
+      const [player, cpu] = await Promise.all([data.battle(entry), data.battle(cpuEntry)]);
+      if (isCancelled()) return;
+      localStorage.setItem("pokemonToFight", JSON.stringify(player));
+      localStorage.setItem("pokemonToFightCPU", JSON.stringify(cpu));
+      window.location.href = "./battleground.html";
+    } catch {
+      if (!isCancelled()) $battleStatus.text("No se pudo preparar el combate. Vuelve a pulsar Entrenar para reintentar.");
+    } finally {
+      if (!isCancelled()) {
+        selecting = false;
+        $battleButton.text("Entrenar").attr("aria-disabled", "false");
+      }
+    }
+  });
+
+  async function initialize() {
+    $status.text("Cargando catálogo…");
+    try {
+      catalog = await data.catalog();
+      filtered = filterCatalog(catalog, $("#searchInputPokedex").val());
+      page = 1;
+      render();
+    } catch {
+      $status.empty().append("No se pudo conectar con PokéAPI. ", $("<button type='button'>").text("Reintentar").on("click", initialize));
+    }
+  }
+  initialize();
+});

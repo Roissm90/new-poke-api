@@ -1,132 +1,129 @@
+import { typeBadgeMarkup } from "./type-badges.mjs";
+import { createMovesData, filterMoves } from "./moves-data.mjs";
+import { PAGE_SIZE } from "./pokedex-data.mjs";
+import { icon } from "./icons.js";
+import { reveal } from "./motion.js";
+
 $(document).ready(async function () {
-  const tiposEspañol = {
-    normal: "Normal",
-    fire: "Fuego",
-    water: "Agua",
-    electric: "Eléctrico",
-    grass: "Planta",
-    ice: "Hielo",
-    fighting: "Lucha",
-    poison: "Veneno",
-    ground: "Tierra",
-    flying: "Volador",
-    psychic: "Psíquico",
-    bug: "Bicho",
-    rock: "Roca",
-    ghost: "Fantasma",
-    dragon: "Dragón",
-    dark: "Siniestro",
-    steel: "Acero",
-    fairy: "Hada",
-    shadow: "Siniestro", // Algunos movimientos shadow se pueden mapear a Siniestro
-  };
-
-  const url = "https://pokeapi.co/api/v2/move?limit=1000"; // Obtener todos los movimientos
-  let movimientosData;
-  try {
-    movimientosData = await $.get(url);
-    console.log(movimientosData);
-  } catch (error) {
-    console.error("Error al cargar la lista de movimientos:", error);
-    return;
-  }
-
-  const movimientosEnEspañol = [];
-
-  for (let i = 0; i < movimientosData.results.length; i++) {
-    const movimiento = movimientosData.results[i];
-    try {
-      const detalle = await $.get(movimiento.url);
-      const nombreEsp = detalle.names.find((n) => n.language.name === "es");
-      if (nombreEsp) {
-        const efectoEsp =
-          detalle.effect_entries.find((e) => e.language.name === "es")
-            ?.effect || "";
-        const movObj = {
-          name: nombreEsp.name,
-          type: detalle.type.name,
-          power: detalle.power,
-          accuracy: detalle.accuracy,
-          pp: detalle.pp,
-          effect: efectoEsp,
-          damage_class: detalle.damage_class.name,
-        };
-        movimientosEnEspañol.push(movObj);
-
-        // Crear el <li> y añadirlo al UL
-        const li = $(
-          `<li class="move-item text-color-dark" data-aos="fade-up" data-aos-delay="300">${movObj.name}</li>`
-        );
-        li.css("cursor", "pointer"); // opcional, para que parezca clicable
-
-        // Añadir evento click para abrir el modal
-        li.on("click", function () {
-          $(".modal-move").addClass("show");
-          $(".modal-move .title").text(movObj.name);
-          const damageEsp =
-            {
-              physical: "Físico",
-              special: "Especial",
-              status: "Estado",
-            }[movObj.damage_class] || movObj.damage_class;
-          $(".modal-move .damage-class").text(`Tipo de daño: ${damageEsp}`);
-          $(".modal-move .power").text(
-            `Poder: ${movObj.power ? movObj.power : "-"}`
-          );
-          if (movObj.effect !== "") {
-            $(".modal-move .description").text(`Efecto: ${movObj.effect}`);
-          } else {
-            $(".modal-move .description").hide();
-          }
-
-          $(".modal-move .accuracy").text(
-            `Precisión: ${movObj.accuracy ? movObj.accuracy : 100}`
-          );
-          $(".modal-move .pp").text(`PP: ${movObj.pp ? movObj.pp : 5}`);
-          const tipoEsp = tiposEspañol[movObj.type] || movObj.type;
-          $(".modal-move .list-moves-types")
-            .empty()
-            .append(
-              `<li class="type-${
-                movObj.type === "shadow" ? "dark" : movObj.type
-              }">${movObj.type === "shadow" ? "Siniestro" : tipoEsp}</li>`
-            );
-        });
-
-        $(".list-moves").append(li);
-      }
-    } catch (e) {
-      console.error(`Error cargando movimiento ${movimiento.name}:`, e);
-    }
-  }
-
-  console.log(movimientosEnEspañol);
-
-  //FILTRO DE BÚSQUEDA DINÁMICO
-  $("#search-move").on("keyup", function () {
-    const filter = $(this).val().toLowerCase();
-
-    $(".move-item").each(function () {
-      const text = $(this).text().toLowerCase();
-      $(this).toggle(text.includes(filter));
-    });
-  });
-
-  //Cerrar modal clic fuera
+  const data = createMovesData();
+  const $list = $(".list-moves");
   const $modal = $(".modal-move");
-  $modal.on("click", function (e) {
-    if (e.target === this) {
-      $modal.removeClass("show");
+  let catalog = [];
+  let filtered = [];
+  let page = 1;
+  let selectionRevision = 0;
+  let versionLabel = "Escarlata/Púrpura";
+  const $reference = $('<p class="catalog-reference">').insertBefore($list);
+  $('<p class="machine text-color-dark-two">').insertAfter(".modal-move .title");
+  const $summary = $('<p class="catalog-summary" role="status" aria-live="polite">Cargando movimientos…</p>').insertBefore($list);
+  const $pagination = $('<nav class="pokedex-pagination" aria-label="Páginas de movimientos">').insertAfter($list).hide();
+
+  function machineLabel(move) {
+    return move.machineNumber === null ? "Sin MT" : `MT${String(move.machineNumber).padStart(3, "0")}`;
+  }
+
+  function closeModal() {
+    selectionRevision += 1;
+    $modal.removeClass("show").attr("aria-busy", "false");
+  }
+
+  async function openMove(entry) {
+    const revision = ++selectionRevision;
+    $modal.find(".title").text(entry.name);
+    $modal.find(".machine").text(`${machineLabel(entry)} · ${versionLabel}`);
+    $modal.find(".damage-class, .power, .accuracy, .pp").text("-");
+    $modal.find(".list-moves-types").empty().append($("<li>").append(typeBadgeMarkup(entry.type)));
+    $modal.find(".description").text("Cargando detalle…").show();
+    $modal.attr("aria-busy", "true").addClass("show");
+    try {
+      const move = await data.detail(entry);
+      if (revision !== selectionRevision || !$modal.hasClass("show")) return;
+      $modal.find(".damage-class").text({ physical: "Físico", special: "Especial", status: "Estado" }[move.damage_class] || move.damage_class);
+      $modal.find(".power").text(move.power ?? "-");
+      $modal.find(".accuracy").text(move.accuracy === null ? "-" : `${move.accuracy}%`);
+      $modal.find(".pp").text(move.pp ?? "-");
+      $modal.find(".description").text(move.effect ? `Efecto: ${move.effect}` : "").toggle(Boolean(move.effect));
+    } catch {
+      if (revision !== selectionRevision || !$modal.hasClass("show")) return;
+      const $retry = $('<button type="button" class="btn btn-light">').text("Reintentar").prepend(icon("restart")).on("click", () => openMove(entry));
+      $modal.find(".description").empty().append("No se pudo cargar el detalle. ", $retry).show();
+    } finally {
+      if (revision === selectionRevision) $modal.attr("aria-busy", "false");
     }
-  });
+  }
 
-  //Botón para cerrar modal
-  $(".close-modal").on("click", function () {
-    $modal.removeClass("show");
-  });
+  function pagination() {
+    const total = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    const start = Math.max(1, Math.min(page - 1, total - 2));
+    const end = Math.min(total, start + 2);
+    $pagination.empty().show();
+    function button(label, target, disabled, accessibleLabel, iconName = null) {
+      const $button = $('<button type="button">').text(label).attr({ "aria-label": accessibleLabel, title: accessibleLabel })
+        .prop("disabled", disabled).toggleClass("current", target === page && !disabled);
+      if (iconName) $button.empty().append(icon(iconName));
+      if (target === page && !disabled) $button.attr("aria-current", "page");
+      $button.on("click", () => {
+        page = target;
+        render();
+        document.querySelector(".sctn-moves").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      $pagination.append($button);
+    }
+    button("", page - 1, page === 1, "Página anterior", "previous");
+    if (start > 1) button("1", 1, false, "Página 1");
+    if (start > 2) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    for (let number = start; number <= end; number += 1) button(String(number), number, false, `Página ${number}`);
+    if (end < total - 1) $pagination.append('<span class="pagination-gap" aria-hidden="true">…</span>');
+    if (end < total) button(String(total), total, false, `Página ${total}`);
+    button("", page + 1, page === total, "Página siguiente", "next");
+  }
 
-  //Cerrar modal con Escape
-  $(document).on("keydown", function (e) {
-    if (e.key === "Escape") $modal.removeClass("show");
-  });
+  function render() {
+    const entries = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    $list.empty().attr("aria-busy", "false");
+    for (const move of entries) {
+      const $card = $('<li class="move-item" role="button" tabindex="0">')
+        .attr({ "data-mt": move.machineNumber ?? "", "data-id": move.id })
+        .append($("<span class='catalog-item-name'>").text(move.name))
+        .append($("<span class='catalog-item-meta'>")
+          .append($("<strong class='mt-number'>").text(machineLabel(move)))
+          .append(typeBadgeMarkup(move.type)));
+      $card.on("click", () => openMove(move)).on("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); $card.trigger("click"); }
+      });
+      $list.append($card);
+    }
+    pagination();
+    reveal($list);
+    reveal($pagination);
+    const first = (page - 1) * PAGE_SIZE + 1;
+    $summary.text(entries.length ? `Mostrando ${first}–${first + entries.length - 1} de ${filtered.length} · Página ${page} de ${Math.ceil(filtered.length / PAGE_SIZE)}` : "No hay movimientos con ese nombre o MT.");
+  }
+
+  function search() {
+    filtered = filterMoves(catalog, $("#search-move").val());
+    page = 1;
+    render();
+  }
+
+  async function initialize() {
+    $list.attr("aria-busy", "true");
+    $summary.text("Cargando movimientos…");
+    try {
+      const index = await data.catalog();
+      catalog = index.moves;
+      versionLabel = index.versionLabel;
+      $reference.text(`Orden: número de MT · ${versionLabel}`);
+      search();
+    } catch {
+      $list.attr("aria-busy", "false");
+      $summary.empty().append("No se pudo cargar el catálogo. ", $('<button type="button">').text("Reintentar").on("click", initialize));
+    }
+  }
+
+  $("#search-move").on("input", search);
+  $modal.on("click", function (event) { if (event.target === this) closeModal(); });
+  $modal.find(".close-modal").on("click", closeModal);
+  $(document).on("keydown", event => { if (event.key === "Escape") closeModal(); });
+  await initialize();
 });
